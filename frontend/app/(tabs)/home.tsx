@@ -7,20 +7,6 @@ import { FontAwesome, Ionicons } from '@expo/vector-icons';
 export default function HomeScreen() {
   const [textSearch, setTextSearch] = useState('');
   const { user } = useAuth();
-  const BannerData = [
-    {
-      id: 1,
-      image: require('../../assets/images/Onboarding/Onboarding02.jpg'),
-    },
-    {
-      id: 2,
-      image: require('../../assets/images/Onboarding/Onboarding03.jpg'),
-    },
-    {
-      id: 3,
-      image: require('../../assets/images/Onboarding/Onboarding05.jpg'),
-    },
-  ]
   const categories = [
     {
       id: 1,
@@ -88,14 +74,14 @@ export default function HomeScreen() {
               paginationStyle={{ bottom: 10 }}
             >
               <View className="flex-1 justify-center items-center bg-gray-300">
-                {BannerData.map((item) => (
+                {/* {BannerData.map((item) => (
                   <Image
                     key={item.id}
                     source={item.image}
                     className="w-full h-full"
                     resizeMode="cover"
                   />
-                ))}
+                ))} */}
               </View>
             </Swiper>
           </View>
