@@ -1,5 +1,5 @@
-import { View, ScrollView, TouchableOpacity } from 'react-native';
-import { Text } from 'react-native-paper';
+import { View, ScrollView, TouchableOpacity,Text } from 'react-native';
+
 
 const fakeOrders = [
   { id: 'OD001', customer: 'Nguyễn Văn A', total: 500000 },

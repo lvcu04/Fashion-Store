@@ -1,34 +1,49 @@
-import { ScrollView, Text, TextInput, View, Image, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import { ScrollView, Text, TextInput, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useState,useEffect } from 'react';
 import Swiper from 'react-native-swiper';
 import { useAuth } from '@/context/authContext';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import Slider from '@/components/Home/Slider';
+import Categories from '@/components/Home/Categories';
+import Products from '@/components/Home/Products';
+
+type Product = {
+  id: number;
+  title: string;
+  price: number;
+  image: string;
+  // add other fields as needed
+};
 
 export default function HomeScreen() {
   const [textSearch, setTextSearch] = useState('');
   const { user } = useAuth();
-  const categories = [
-    {
-      id: 1,
-      name: 'T-Shirts',
-     
-    },
-    {
-      id: 2,
-      name: 'Jackets',
-      
-    },
-    {
-      id: 3,
-      name: 'Jeans',
-     
-    },
-    {
-      id: 4,
-      name: 'Shoese',
-     
-    },
-  ];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('https://fakestoreapi.com/products/');
+      const data = await response.json();
+      console.log(data);
+      setProducts(data);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+    finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  if (loading) 
+    return (
+      <View className="flex-1 items-center justify-center">
+        <ActivityIndicator size="large" color="#ff0000" />
+      </View>
+    );
 
   return (
     <View className="flex-1 bg-white">
@@ -64,45 +79,13 @@ export default function HomeScreen() {
         {/* Slider */}
         <View className="mb-6">
           <Text className="font-bold text-lg mb-2">#Special for you</Text>
-          <View style={{ height: 180, borderRadius: 10, overflow: 'hidden' }}>
-            {/* Example Slider */}
-            <Swiper
-              autoplay={true}
-              loop={true}
-              dotColor="#90A4AE"
-              activeDotColor="#13274F"
-              paginationStyle={{ bottom: 10 }}
-            >
-              <View className="flex-1 justify-center items-center bg-gray-300">
-                {/* {BannerData.map((item) => (
-                  <Image
-                    key={item.id}
-                    source={item.image}
-                    className="w-full h-full"
-                    resizeMode="cover"
-                  />
-                ))} */}
-              </View>
-            </Swiper>
-          </View>
+          <Slider/>
         </View>
 
         {/* Categories Section */}
         <View className="mb-4">
           <Text className="font-bold text-lg">Categories</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-2">
-            <TouchableOpacity className='flex-row'>
-              {categories.map((category) => (
-              <View
-                key={category.id}
-                className="bg-gray-100 p-3 rounded-full mr-3"
-              >
-                <Text className="text-gray-700">{category.name}</Text>
-              </View>
-            ))}
-            </TouchableOpacity>
-            
-          </ScrollView>
+          <Categories/>
         </View>
 
         {/* Top T-Shirt Section */}
@@ -110,6 +93,10 @@ export default function HomeScreen() {
           <Text className="font-bold text-lg">Top T-Shirt</Text>
           <Text className="text-gray-500 text-sm">View all</Text>
         </View>
+
+        {/* Product List */}
+        <Products products={products} />
+
         {/* Add product list here */}
       </ScrollView>
     </View>

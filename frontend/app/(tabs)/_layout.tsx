@@ -3,10 +3,10 @@ import { useAuth } from '@/context/authContext';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function TabsLayout() {
-  const { isAuthenticated } = useAuth();
+//   const { isAuthenticated } = useAuth();
 
-  if (isAuthenticated === undefined) return null;
-  if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
+//   if (isAuthenticated === undefined) return null;
+//   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
 
   return (
     <Tabs screenOptions={{ headerShown: false }}>

@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { ScrollView, View, TouchableOpacity } from 'react-native';
+import { ScrollView, View, TouchableOpacity  } from 'react-native';
 import { Text } from 'react-native-paper';
 
 const fakeProducts = [
@@ -26,7 +26,7 @@ export default function ProductsPage() {
             <Text className="font-semibold">Chỉnh sửa sản phẩm</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push('/admin/products/addProducts')}>
+        <TouchableOpacity onPress={() => router.push('/(admin)/products/addProducts')}>
           <View className="bg-blue-400 items-center rounded-xl p-4 mb-3 shadow">
             <Text className="font-semibold">Thêm sản phẩm</Text>
           </View>

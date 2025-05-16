@@ -1,5 +1,5 @@
-import { View, TextInput, Button, TouchableOpacity } from 'react-native';
-import { Text } from 'react-native-paper';
+import { View, TextInput, Button, TouchableOpacity,Text } from 'react-native';
+
 import { useState } from 'react';
 
 export default function AddProduct() {
