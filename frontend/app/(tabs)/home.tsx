@@ -13,7 +13,7 @@ type Product = {
   title: string;
   price: number;
   image: string;
-  // add other fields as needed
+ 
 };
 
 export default function HomeScreen() {
@@ -25,7 +25,7 @@ export default function HomeScreen() {
     try {
       const response = await fetch('https://fakestoreapi.com/products/');
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
       setProducts(data);
     } catch (error) {
       console.error('Error fetching products:', error);

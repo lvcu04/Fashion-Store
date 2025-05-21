@@ -1,12 +1,13 @@
-import { View, Text, TouchableOpacity,Image,ScrollView } from 'react-native'
-import React from 'react'
-import { useAuth } from '@/context/authContext'
-import { useRouter } from 'expo-router'
+import { useAuth } from '@/context/authContext';
 import { FontAwesome } from '@expo/vector-icons';
-const Profile = () => {
-  const { logout,user } = useAuth();
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
-  const router = useRouter()
+const Profile = () => {
+  const { logout, user } = useAuth();
+  const router = useRouter();
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -16,18 +17,25 @@ const Profile = () => {
     }
   };
 
-  const profileOptions = [
-    { label: 'Personal Details', icon: 'user' },
-    { label: 'My Order', icon: 'shopping-bag' },
-    { label: 'My Favourites', icon: 'heart' },
-    { label: 'Shipping Address', icon: 'truck' },
-    { label: 'My Card', icon: 'credit-card' },
-    { label: 'Settings', icon: 'cog' },
+  type OptionItem = {
+    label: string;
+    icon: string;
+    route?: string;
+  };
+
+  const profileOptions: OptionItem[] = [
+    { label: 'Personal Details', icon: 'user'},
+    { label: 'My Order', icon: 'shopping-bag', route: '/(tabs)/myOrder' },
+    { label: 'My Favourites', icon: 'heart', route: '/(tabs)/favourite' },
+    { label: 'Shipping Address', icon: 'truck'},
+    { label: 'My Card', icon: 'credit-card'},
+    { label: 'Settings', icon: 'cog'},
+    { label: 'My Cart', icon: 'shopping-cart', route: '/myCart'},
   ];
 
-  const policyOptions = [
-    { label: 'FAQs', icon: 'question-circle' },
-    { label: 'Privacy Policy', icon: 'shield' },
+  const policyOptions: OptionItem[] = [
+    { label: 'FAQs', icon: 'question-circle'},
+    { label: 'Privacy Policy', icon: 'shield'},
   ];
 
   return (
@@ -38,7 +46,9 @@ const Profile = () => {
           source={{ uri: user?.photoURL || 'https://i.pravatar.cc/100' }}
           className="w-20 h-20 rounded-full mb-2"
         />
-        <Text className="text-lg font-semibold">{user?.displayName || 'User Name'}</Text>
+        <Text className="text-lg font-semibold">
+          {user?.displayName || 'User Name'}
+        </Text>
         <Text className="text-gray-500">{user?.email || 'email@example.com'}</Text>
       </View>
 
@@ -47,6 +57,11 @@ const Profile = () => {
         {profileOptions.map((item, index) => (
           <TouchableOpacity
             key={index}
+            onPress={() => {
+              if (item.route) {
+                router.push(item.route as never);
+              }
+            }}
             className="flex-row justify-between items-center px-4 py-5 border-b border-gray-200"
           >
             <View className="flex-row items-center">
@@ -63,6 +78,11 @@ const Profile = () => {
         {policyOptions.map((item, index) => (
           <TouchableOpacity
             key={index}
+            onPress={() => {
+              if (item.route) {
+                router.push(item.route as any);
+              }
+            }}
             className="flex-row justify-between items-center px-4 py-5 border-b border-gray-200"
           >
             <View className="flex-row items-center">
@@ -76,7 +96,7 @@ const Profile = () => {
 
       {/* Logout button */}
       <TouchableOpacity
-        onPress={handleLogout} 
+        onPress={handleLogout}
         style={{
           backgroundColor: 'blue',
           padding: 10,
@@ -90,4 +110,4 @@ const Profile = () => {
   );
 };
 
-export default Profile
+export default Profile;
