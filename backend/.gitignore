@@ -1,0 +1,5 @@
+# Thư mục node_modules (tự cài lại bằng npm install)
+node_modules/
+
+# Biến môi trường chứa thông tin nhạy cảm (API keys, DB URI,...)
+.env
