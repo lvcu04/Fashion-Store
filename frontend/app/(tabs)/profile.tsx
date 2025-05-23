@@ -24,13 +24,13 @@ const Profile = () => {
   };
 
   const profileOptions: OptionItem[] = [
-    { label: 'Personal Details', icon: 'user'},
+    { label: 'Personal Details', icon: 'user' , route:'/(userProfile)/UserProfile' },
     { label: 'My Order', icon: 'shopping-bag', route: '/(tabs)/myOrder' },
     { label: 'My Favourites', icon: 'heart', route: '/(tabs)/favourite' },
     { label: 'Shipping Address', icon: 'truck'},
-    { label: 'My Card', icon: 'credit-card'},
+    { label: 'My Card', icon: 'credit-card',route:'(card)/Card' },
     { label: 'Settings', icon: 'cog'},
-    { label: 'My Cart', icon: 'shopping-cart', route: '/myCart'},
+    { label: 'My Cart', icon: 'shopping-cart', route: '/(cart)/Cart'},
   ];
 
   const policyOptions: OptionItem[] = [
@@ -100,7 +100,7 @@ const Profile = () => {
         style={{
           backgroundColor: 'blue',
           padding: 10,
-          borderRadius: 5,
+          borderRadius: 20,
           marginTop: 20,
         }}
       >

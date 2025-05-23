@@ -1,7 +1,16 @@
-import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { MaterialIcons ,Ionicons,AntDesign } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useFavourites } from '@/context/favouriteContext'; 
+
+
+type Product = {
+  id: string | number;
+  image: string;
+  title: string;
+  price: number;
+};
 
 const ProductDetailScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -9,8 +18,20 @@ const ProductDetailScreen = () => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState('L'); // Kích thước mặc định
+  const [selectedSize, setSelectedSize] = useState('S'); 
+  const { favourites, addFavourite,  removeFavourite } = useFavourites();
 
+
+  const toggleFavourite = (product : Product) => {
+
+    const isFavourite = favourites.some(item => item.id === product.id)
+    if(isFavourite){
+      removeFavourite(Number(product.id));
+    }
+    else{
+      addFavourite({...product, id : Number(product.id)})
+    }
+  }
   const fetchProductDetails = async (id: string) => {
     try {
       const response = await fetch(`https://fakestoreapi.com/products/${id}`);
@@ -47,15 +68,28 @@ const ProductDetailScreen = () => {
 
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
+  // Determine if the current product is a favourite
+  const isFavourite = favourites.some(item => item.id === Number(data.id));
+
   return (
+      <>
     <ScrollView className="flex-1 bg-white">
       {/* Nút Back và Wishlist */}
       <View className="flex-row justify-between items-center px-4 py-3">
         <TouchableOpacity onPress={() => router.push('/(tabs)/home')}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity>
-          <AntDesign name="heart" size={24} color="black" />
+        <TouchableOpacity onPress={() => toggleFavourite({
+          id: data.id,
+          image: data.image,
+          title: data.title,
+          price: data.price,
+        })}>
+          <MaterialIcons
+            name={isFavourite ? 'favorite' : 'favorite-border'}
+            size={25}
+            color="black"
+          />
         </TouchableOpacity>
       </View>
 
@@ -137,14 +171,43 @@ const ProductDetailScreen = () => {
           </View>
           <Text className="text-2xl font-bold">${data.price}</Text>
         </View>
+        <View className="my-6 ">
+            <Text className="text-lg font-semibold mb-3">
+              Additional Information
+            </Text>
+            <View className="flex-row justify-between mb-2">
+              <Text className="text-gray-600">Category</Text>
+              <Text className="font-medium capitalize">{data.category}</Text>
+            </View>
+            <View className="flex-row justify-between mb-2">
+              <Text className="text-gray-600">Instock</Text>
+              <Text className="font-medium">
+                {data.rating?.count}
+              </Text>
+            </View>
+            <View className="flex-row justify-between">
+              <Text className="text-gray-600">Shipping</Text>
+              <Text className="font-medium">Free</Text>
+            </View>
+          </View>
 
         {/* Nút Add to Cart */}
-        <TouchableOpacity className="bg-black rounded-full py-4 mt-6 flex-row items-center justify-center">
-          <AntDesign name="shoppingcart" size={20} color="white" />
-          <Text className="text-white font-semibold ml-2">Add to Cart</Text>
-        </TouchableOpacity>
+        
       </View>
     </ScrollView>
+    <View className="flex-row items-center px-4 py-4 border-t border-gray-200">
+        <TouchableOpacity className="flex-1 bg-black rounded-full py-4 mr-3">
+          <Text className="text-white text-center font-semibold">
+            Add to Cart
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.push('/(cart)/Cart')}
+        className="w-14 h-14 items-center justify-center rounded-full bg-gray-100">
+          <MaterialIcons name="shopping-cart" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+    </>
   );
 };
 

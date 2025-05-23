@@ -1,6 +1,6 @@
 import { View, Text, Image, TouchableOpacity} from 'react-native';
-import React, { useState } from 'react';
-import { router, useNavigation } from 'expo-router';
+import React from 'react';
+import { router } from 'expo-router';
 import Onboarding from 'react-native-onboarding-swiper';
 
 type Props = {};
@@ -16,7 +16,7 @@ const OnboardingScreen = (props: Props) => {
 </TouchableOpacity>
 );
   const handleDone = () => {
-    router.push('./(auth)/login');
+    router.push('/(auth)/login');
   };
   return (
     <View className="flex-1">
@@ -30,7 +30,7 @@ const OnboardingScreen = (props: Props) => {
             image: (
               <View className="relative w-full h-full mt-11">
                 <Image
-                  source={require('../assets/images/Onboarding/Onboarding01.jpg')}
+                  source={require('../../assets/images/Onboarding/Onboarding01.jpg')}
                   className="w-full h-[700px]  object-cover"
                 />
                  <Text className="absolute top-[420px] rotate-45 left-[10px] text-black font-extralight italic text-[20px] tracking-tight">
@@ -47,7 +47,7 @@ const OnboardingScreen = (props: Props) => {
             image: (
               <View className="relative w-full h-full mt-11">
                 <Image
-                  source={require('../assets/images/Onboarding/Onboarding02.jpg')}
+                  source={require('../../assets/images/Onboarding/Onboarding02.jpg')}
                   className="w-full h-full object-cover"
                 />
                   <Text className="absolute top-[200px] left-[90px] text-white text-3xl font-semibold rotate-45 tracking-wider">
@@ -60,7 +60,7 @@ const OnboardingScreen = (props: Props) => {
           },
           {
             backgroundColor: '#fff',
-            image: <Image source={require('../assets/images/Onboarding/Onboarding03.jpg')} 
+            image: <Image source={require('../../assets/images/Onboarding/Onboarding03.jpg')} 
             className="w-full h-full object-cover mt-11" 
             />,
             title: "",

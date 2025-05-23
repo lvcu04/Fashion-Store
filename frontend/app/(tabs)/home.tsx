@@ -1,9 +1,8 @@
-import { ScrollView, Text, TextInput, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { ScrollView, Text, TextInput, View, Image, ActivityIndicator } from 'react-native';
 import { useState,useEffect } from 'react';
-import Swiper from 'react-native-swiper';
 import { useAuth } from '@/context/authContext';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+
 import Slider from '@/components/Home/Slider';
 import Categories from '@/components/Home/Categories';
 import Products from '@/components/Home/Products';
