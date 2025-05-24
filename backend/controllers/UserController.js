@@ -63,8 +63,13 @@ const userController = {
         console.error('Error getting user:', error);
         res.status(500).json({ error: 'Error getting user' });
     }
-   }
-
+   },
+   getRole: async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+    res.status(200).json({ role: req.userRole });
+  },
 };
 module.exports = userController
   

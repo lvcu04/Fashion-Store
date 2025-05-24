@@ -3,3 +3,5 @@ node_modules/
 
 # Biến môi trường chứa thông tin nhạy cảm (API keys, DB URI,...)
 .env
+
+clothing-app-firebase-adminsdk.json

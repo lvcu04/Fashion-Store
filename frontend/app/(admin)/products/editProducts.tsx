@@ -19,6 +19,15 @@ export default function EditProductPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const product = mockProducts.find((p) => p.id === id);
 
+  // State cho form (initialize with empty or default values)
+  const [name, setName] = useState(product ? product.name : "");
+  const [price, setPrice] = useState(product ? product.price.toString() : "");
+  const [category, setCategory] = useState(product ? product.category : "");
+  const [image, setImage] = useState(product ? product.image : "");
+  const [stock, setStock] = useState(product ? product.stock.toString() : "");
+  const [status, setStatus] = useState(product ? product.status : "active");
+  const [description, setDescription] = useState(product ? product.description : "");
+
   // Nếu không tìm thấy sản phẩm
   if (!product) {
     return (
@@ -33,15 +42,6 @@ export default function EditProductPage() {
       </View>
     );
   }
-
-  // State cho form
-  const [name, setName] = useState(product.name);
-  const [price, setPrice] = useState(product.price.toString());
-  const [category, setCategory] = useState(product.category);
-  const [image, setImage] = useState(product.image);
-  const [stock, setStock] = useState(product.stock.toString());
-  const [status, setStatus] = useState(product.status);
-  const [description, setDescription] = useState(product.description);
 
   const handleSave = () => {
     // Ở đây bạn sẽ gọi API để cập nhật sản phẩm

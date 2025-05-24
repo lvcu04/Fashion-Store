@@ -18,6 +18,7 @@ import { auth } from "@/firebase/firebaseConfig";
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean | undefined;
+  role: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
@@ -34,44 +35,80 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(undefined);
+  const [role, setRole] = useState<string | null>(null);
+
+  const fetchRole = async (user: User) => {
+    try {
+      const token = await user.getIdToken();
+      const response = await fetch("http://192.168.217.1:5000/api/user/role", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch role");
+
+      const data = await response.json();
+      setRole(data.role);
+      console.log(role)
+    } catch (error) {
+      console.error("Failed to fetch role:", error);
+      setRole(null);
+    }
+  };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       setIsAuthenticated(!!user);
+
+      if (user) {
+        try {
+          await fetchRole(user);
+        } catch (error) {
+          console.error("Auth state role fetch failed:", error);
+        }
+      } else {
+        setRole(null);
+      }
     });
+
     return () => unsubscribe();
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const UserCredential = await signInWithEmailAndPassword(auth, email, password);
       setIsAuthenticated(true);
+      const token = await UserCredential.user.getIdToken();
+      console.log("Token:", token);
+
+      const currentUser = auth.currentUser;
+      if (currentUser) await fetchRole(currentUser);
     } catch (error: any) {
       setIsAuthenticated(false);
-  
-      // Kiểm tra mã lỗi
       switch (error.code) {
         case "auth/invalid-email":
-          alert("Email không hợp lệ !");
+          alert("Email không hợp lệ!");
           break;
         case "auth/user-not-found":
-          alert("Tài khoản không tồn tại !");
+          alert("Tài khoản không tồn tại!");
           break;
         case "auth/wrong-password":
-          alert("Sai mật khẩu !");
+          alert("Sai mật khẩu!");
           break;
         default:
           alert("Đăng nhập thất bại. Vui lòng thử lại sau.");
       }
-      
     }
   };
-  
 
   const logout = async () => {
     try {
       await signOut(auth);
+      setUser(null);
+      setRole(null);
+      setIsAuthenticated(false);
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -85,7 +122,7 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
       setIsAuthenticated(false);
     }
   };
-  
+
   const handleGoogleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
@@ -103,7 +140,6 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
       console.error("Facebook login error:", error);
     }
   };
-  
 
   const resetPassword = async (email: string) => {
     try {
@@ -148,6 +184,7 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
       value={{
         user,
         isAuthenticated,
+        role,
         login,
         logout,
         register,

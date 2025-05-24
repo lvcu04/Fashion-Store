@@ -2,12 +2,16 @@ import { Stack, Redirect } from 'expo-router';
 import { useAuth } from '@/context/authContext';
 
 export default function AuthLayout() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated ,role } = useAuth();
 
   if (isAuthenticated === undefined) return null;
-  // if (isAuthenticated) return <Redirect href="/(tabs)/home" />;
-  // if (isAuthenticated) return <Redirect href="/admin/layout" />;
-  if (isAuthenticated) return <Redirect href="/(tabs)/home" />;
+
+  // if(!isAuthenticated) return <Redirect href="/(auth)/login" />;
+ 
+  if(isAuthenticated){
+    if( role === 'admin') return <Redirect href="/(admin)" />; 
+    return <Redirect href="/(tabs)/home" />; 
+  }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
