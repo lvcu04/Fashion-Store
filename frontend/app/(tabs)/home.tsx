@@ -1,43 +1,60 @@
+
 import { ScrollView, Text, TextInput, View, Image, ActivityIndicator } from 'react-native';
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/authContext';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
-
+import { addToFavourites } from '@/utils/favouriteStorage';
 import Slider from '@/components/Home/Slider';
 import Categories from '@/components/Home/Categories';
 import Products from '@/components/Home/Products';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 type Product = {
   id: number;
   title: string;
   price: number;
   image: string;
- 
 };
+
+
 
 export default function HomeScreen() {
   const [textSearch, setTextSearch] = useState('');
   const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
+  const [favourites, setFavourites] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
+  
+  const handleAddFavourite = async (item: Product) => {
+    await addToFavourites(item);
+    await loadFavourites();
+  };
+
   const fetchProducts = async () => {
+    setLoading(true);
     try {
       const response = await fetch('https://fakestoreapi.com/products/');
       const data = await response.json();
-      // console.log(data);
       setProducts(data);
     } catch (error) {
       console.error('Error fetching products:', error);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
-  }
+  };
+
+  const loadFavourites = async () => {
+    const data = await AsyncStorage.getItem('FAVOURITES_LIST');
+    if (data) {
+      setFavourites(JSON.parse(data));
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
+    loadFavourites();
   }, []);
 
-  if (loading) 
+  if (loading)
     return (
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" color="#ff0000" />
@@ -56,13 +73,13 @@ export default function HomeScreen() {
           <FontAwesome name="bell-o" size={22} color="black" />
         </View>
 
-        {/* Welcome Text */}
+        {/* Welcome */}
         <View className="mb-5">
           <Text className="font-bold text-3xl">Welcome,</Text>
           <Text className="text-xl text-gray-500">Our Fashions App</Text>
         </View>
 
-        {/* Search Box */}
+        {/* Search */}
         <View className="flex flex-row mb-6 items-center">
           <TextInput
             className="w-full bg-gray-100 p-3 rounded-full border border-gray-300"
@@ -71,32 +88,30 @@ export default function HomeScreen() {
             onChangeText={setTextSearch}
           />
           <View className="bg-gray-100 p-3 rounded-full ml-2">
-            <Ionicons name='search' size={20} color="black" className="" />
+            <Ionicons name="search" size={20} color="black" />
           </View>
         </View>
 
         {/* Slider */}
         <View className="mb-6">
           <Text className="font-bold text-lg mb-2">#Special for you</Text>
-          <Slider/>
+          <Slider />
         </View>
 
-        {/* Categories Section */}
+        {/* Categories */}
         <View className="mb-4">
           <Text className="font-bold text-lg">Categories</Text>
-          <Categories/>
+          <Categories />
         </View>
 
-        {/* Top T-Shirt Section */}
+        {/* Top T-Shirt */}
         <View className="flex-row justify-between items-center mb-2">
           <Text className="font-bold text-lg">Top T-Shirt</Text>
           <Text className="text-gray-500 text-sm">View all</Text>
         </View>
 
         {/* Product List */}
-        <Products products={products} />
-
-        {/* Add product list here */}
+        <Products products={products} onAddFavourite={handleAddFavourite} favourites={favourites} />
       </ScrollView>
     </View>
   );

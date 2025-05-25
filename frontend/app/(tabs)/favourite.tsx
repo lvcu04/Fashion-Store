@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import Animated, {
@@ -8,11 +8,13 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
-import { useFavourites } from '@/context/favouriteContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const STORAGE_KEY = 'FAVOURITES_LIST';
 
 const Favourite = () => {
   const router = useRouter();
-  const { favourites, removeFavourite } = useFavourites();
+  const [favourites, setFavourites] = useState<any[]>([]);
 
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
@@ -34,8 +36,36 @@ const Favourite = () => {
     opacity.value = 1;
   };
 
+  const loadFavourites = async () => {
+    try {
+      const data = await AsyncStorage.getItem(STORAGE_KEY);
+      if (data) {
+        setFavourites(JSON.parse(data));
+      }
+    } catch (e) {
+      console.log('Error loading favourites:', e);
+    }
+  };
+
+  const removeFavourite = async (id: number) => {
+    const newList = favourites.filter((item) => item.id !== id);
+    setFavourites(newList);
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newList));
+    } catch (e) {
+      console.log('Error saving favourites:', e);
+    }
+  };
+
+  useEffect(() => {
+    loadFavourites();
+  }, []);
+
   const renderItem = ({ item }: any) => (
-    <View className="flex-row items-center p-4 bg-white rounded-2xl mb-4 shadow-lg">
+    <TouchableOpacity
+      onPress={() => router.push({ pathname: '/productDetails/[id]', params: { id: item.id } })}
+      className="flex-row items-center p-4 bg-white rounded-2xl mb-4 shadow-lg"
+    >
       <Image
         source={{ uri: item.image }}
         style={{ width: 100, height: 100 }}
@@ -70,7 +100,7 @@ const Favourite = () => {
           <AntDesign name="close" size={12} color="white" />
         </TouchableOpacity>
       </Animated.View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -82,7 +112,7 @@ const Favourite = () => {
       {favourites.length === 0 ? (
         <View className="flex-1 items-center justify-center">
           <AntDesign name="hearto" size={50} color="#d1d5db" />
-          <Text className="text-xl font-semibold text-gray-500 mt-4">
+          <Text className="text-lg font-semibold text-gray-500 mt-4">
             Your Favourite list is empty
           </Text>
           <Text className="text-sm text-gray-400 mt-2">
