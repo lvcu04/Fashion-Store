@@ -14,3 +14,5 @@ router.post('/addProduct',upload.single('image'), ProductController.addProduct);
 router.put('/editProduct/:product_id', upload.single('image'), ProductController.editProduct);// http://localhost:5000/api/product/editProduct
 router.delete('/deleteProduct/:id', ProductController.deleteProduct);// http://localhost:5000/api/product/deleteProduct/:id
 module.exports = router;
+
+//IP Simulater :192.168.217.1

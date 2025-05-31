@@ -32,37 +32,53 @@
         },
         // createProduct, updateProduct, deleteProduct...
 
-
-        // createProduct
+        // addProduct
+        
         addProduct: async (req, res) => {
-        try {
-            const image = req.file?.path || '';
-            const {
-            product_id, productName, description, price,
-            size, condition, location, sellerName, category_id
-            } = req.body;
+            try {
+                // Ưu tiên file nếu có, nếu không thì dùng image từ body
+                const image = req.file?.path || req.body.image || '';
 
-            if (!product_id || !productName || !price || !category_id) {
-            return res.status(400).json({ message: 'Thiếu thông tin bắt buộc' });
+                const {
+                product_id, productName, description, price,
+                size, condition, location, sellerName, category_id, status, quantity
+                } = req.body;
+                 console.log("Dữ liệu gửi lên:", req.body);
+
+                if (!product_id || !productName || !price || !category_id) {
+                return res.status(400).json({ message: 'Thiếu thông tin bắt buộc' });
+                }
+               
+
+
+                const exists = await Product.findOne({ product_id });
+                if (exists) {
+                return res.status(409).json({ message: 'Mã sản phẩm đã tồn tại' });
+                }
+
+                const newProduct = new Product({
+                product_id,
+                productName,
+                image,
+                description,
+                price,
+                size,
+                condition,
+                location,
+                sellerName,
+                category_id,
+                status,
+                quantity
+                });
+
+                await newProduct.save();
+                res.status(201).json(newProduct);
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Error creating product' });
             }
+            },
 
-            const exists = await Product.findOne({ product_id });
-            if (exists) {
-            return res.status(409).json({ message: 'Mã sản phẩm đã tồn tại' });
-            }
-
-            const newProduct = new Product({
-            product_id, productName, image, description, price,
-            size, condition, location, sellerName, category_id
-            });
-
-            await newProduct.save();
-            res.status(201).json(newProduct);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Error creating product' });
-        }
-        },
 
         // editProduct
             editProduct: async (req, res) => {
@@ -76,7 +92,10 @@
                 condition,
                 location,
                 sellerName,
-                category_id
+                category_id,
+                status,
+                image,  
+                quantity
             } = req.body;
             try {
                 const updateFields = {
@@ -87,12 +106,17 @@
                     condition,
                     location,
                     sellerName,
-                    category_id
+                    status,
+                    category_id,
+                    quantity
                 };
-                // Nếu có ảnh mới, upload lên Cloudinary
-                if (req.file && req.file.path) {
-                    updateFields.image = req.file.path; // Đây là secure_url do cloudinary + multer-storage-cloudinary sinh ra
-                 }
+                // Nếu có file upload, ưu tiên dùng file
+                // if (req.file && req.file.path) {
+                if (req.file?.path) {
+                updateFields.image = req.file.path;
+                } else if (image) {
+                updateFields.image = image; // Nếu không có file, dùng ảnh từ body
+                }
                 // Cập nhật sản phẩm
                 const updatedProduct = await Product.findOneAndUpdate(
                     { product_id },
@@ -103,7 +127,6 @@
                     return res.status(404).json({ message: 'Product not found' });
                 }
                 res.status(200).json(updatedProduct);
-                console.log('REQ.FILE:', req.file); // thêm ở đầu editProduct
             } catch (error) {
                 console.error(error);
                 res.status(500).json({ error: 'Error updating product' });
@@ -113,7 +136,7 @@
         deleteProduct: async (req, res) => {
             const { product_id } = req.params;
             try {
-                const deletedProduct = await Product.findOneAndDelete( product_id );
+                const deletedProduct = await Product.findOneAndDelete({ product_id });
                 if (!deletedProduct) {
                     return res.status(404).json({ message: 'Product not found' });
                 }   

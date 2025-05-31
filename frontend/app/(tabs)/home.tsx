@@ -8,22 +8,29 @@ import Slider from '@/components/Home/Slider';
 import Categories from '@/components/Home/Categories';
 import Products from '@/components/Home/Products';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API } from '@/constants/api';
 type Product = {
   id: number;
-  title: string;
+  productName: string;
   price: number;
   image: string;
 };
 
-
+interface Category {
+  id: number;
+  categoryName: string;
+}
 
 export default function HomeScreen() {
   const [textSearch, setTextSearch] = useState('');
-  const { user } = useAuth();
+  const { firebaseUser } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [favourites, setFavourites] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
-  
+
+
+
   const handleAddFavourite = async (item: Product) => {
     await addToFavourites(item);
     await loadFavourites();
@@ -32,8 +39,9 @@ export default function HomeScreen() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://fakestoreapi.com/products/');
+      const response = await fetch(API.product.all);
       const data = await response.json();
+      console.log('Fetched products:', data);
       setProducts(data);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -41,6 +49,29 @@ export default function HomeScreen() {
       setLoading(false);
     }
   };
+  
+
+
+    
+  const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://192.168.217.1:5000/api/category/allCategory');
+        const data = await response.json();
+
+        console.log('Fetched categories:', data);
+        
+
+        const formattedCategories: Category[] = data.map((category: any, index: number): Category => ({
+          id: index + 1,
+          categoryName: category.categoryName.charAt(0).toUpperCase() + category.categoryName.slice(1),
+        }));
+        setCategories(formattedCategories);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+ 
 
   const loadFavourites = async () => {
     const data = await AsyncStorage.getItem('FAVOURITES_LIST');
@@ -51,7 +82,9 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
     loadFavourites();
+
   }, []);
 
   if (loading)
@@ -62,12 +95,12 @@ export default function HomeScreen() {
     );
 
   return (
-    <View className="flex-1 bg-white">
+    <View className='flex-1 bg-white'>
       <ScrollView className="flex-1 px-5 pt-6" showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View className="flex-row justify-between items-center mb-5">
           <Image
-            source={{ uri: user?.photoURL || 'https://i.pravatar.cc/100' }}
+            source={{ uri: firebaseUser?.photoURL || 'https://i.pravatar.cc/100' }}
             className="w-[40px] h-[40px] rounded-full"
           />
           <FontAwesome name="bell-o" size={22} color="black" />
@@ -80,9 +113,9 @@ export default function HomeScreen() {
         </View>
 
         {/* Search */}
-        <View className="flex flex-row mb-6 items-center">
+        <View className="flex flex-row mb-6 items-center justify-around">
           <TextInput
-            className="w-full bg-gray-100 p-3 rounded-full border border-gray-300"
+            className="w-3/4 bg-gray-100 p-3 rounded-full border border-gray-300"
             placeholder="Search for products..."
             value={textSearch}
             onChangeText={setTextSearch}
@@ -101,7 +134,7 @@ export default function HomeScreen() {
         {/* Categories */}
         <View className="mb-4">
           <Text className="font-bold text-lg">Categories</Text>
-          <Categories />
+          <Categories categories={categories} />
         </View>
 
         {/* Top T-Shirt */}

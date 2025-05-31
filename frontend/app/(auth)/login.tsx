@@ -3,7 +3,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import * as Font from 'expo-font';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -39,28 +39,37 @@ const LoginScreen = () => {
   };
 
   const handleGoogle = async () => {
-    try {
-      await handleGoogleLogin();
+  try {
+    const user = await handleGoogleLogin();
+    if (user) {
       router.replace('/(tabs)/home');
-    } catch (error: any) {
-      alert('Đăng nhập bằng Google thất bại: ' + error.message);
+    } else {
+      alert('Đăng nhập bằng Google thất bại');
     }
-  };
+  } catch (error: any) {
+    alert('Đăng nhập bằng Google thất bại: ' + error.message);
+  }
+};
 
   const handleFacebook = async () => {
     try {
-      await handleFacebookLogin();
-      router.replace('/(tabs)/home');
+      const user = await handleFacebookLogin();
+      if (user) {
+        router.replace('/(tabs)/home');
+      } else {
+        alert('Đăng nhập bằng Facebook thất bại');
+      }
     } catch (error: any) {
       alert('Đăng nhập bằng Facebook thất bại: ' + error.message);
     }
   };
 
   return (
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }} className="bg-white">
     <ScrollView showsHorizontalScrollIndicator={false}>
         <View className="flex-1 justify-center px-6 bg-white">
           {/* Logo */}
-          <View className="items-center mb-6">
+          <View className="items-center mb-6 mt-14">
             <Text
               style={{
                 fontFamily: 'GreatVibes',
@@ -164,6 +173,7 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

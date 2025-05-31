@@ -6,7 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 type Product = {
   id: number;
   image: string;
-  title: string;
+  productName: string;
   price: number;
 };
 
@@ -23,7 +23,7 @@ const Products: React.FC<ProductsProps> = ({ products, onAddFavourite , favourit
     <View className="flex-row flex-wrap justify-between px-1">
       {products.map((product) => (
         <TouchableOpacity
-          key={product.id}
+           key={product.id?.toString() || Math.random().toString()}
           className="bg-white rounded-xl shadow-md mb-4 w-[48%] overflow-hidden border border-gray-200"
           style={{ elevation: 3 }}
           onPress={() => {
@@ -52,7 +52,7 @@ const Products: React.FC<ProductsProps> = ({ products, onAddFavourite , favourit
           </View>
           <View className="p-3 items-center">
             <Text className="font-bold text-sm text-gray-900 uppercase" numberOfLines={1}>
-              {typeof product.title === 'string' ? product.title : 'Unknown Product'}
+              {typeof product.productName === 'string' ? product.productName : 'Unknown Product'}
             </Text>
             <Text className="text-gray-900 text-sm font-semibold mt-1">
               ${typeof product.price === 'number' ? product.price.toFixed(2) : '0.00'}

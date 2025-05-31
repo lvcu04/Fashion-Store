@@ -5,7 +5,7 @@ import React from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 const Profile = () => {
-  const { logout, user } = useAuth();
+  const { logout, firebaseUser } = useAuth();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -39,17 +39,18 @@ const Profile = () => {
   ];
 
   return (
-    <ScrollView className="flex-1 bg-gray-100 p-4">
+    <ScrollView className='flex-1 bg- white p-4'>
       {/* Avatar & User Info */}
       <View className="bg-white rounded-2xl shadow p-4 items-center mb-6">
         <Image
-          source={{ uri: user?.photoURL || 'https://i.pravatar.cc/100' }}
+          source={{ uri: firebaseUser?.photoURL || 'https://i.pravatar.cc/100' }}
           className="w-20 h-20 rounded-full mb-2"
         />
         <Text className="text-lg font-semibold">
-          {user?.displayName || 'User Name'}
+          {firebaseUser?.displayName || 'User Name'}
+          
         </Text>
-        <Text className="text-gray-500">{user?.email || 'email@example.com'}</Text>
+        <Text className="text-gray-500">{firebaseUser?.email || 'email@example.com'}</Text>
       </View>
 
       {/* Main options */}

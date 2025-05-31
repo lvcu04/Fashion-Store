@@ -63,7 +63,7 @@ const MyCard = () => {
   };
 
   return (
-    <View className="flex-1 bg-gray-100">
+    <View className="flex-1 bg-white ">
       {/* Header */}
       <View className="flex-row items-center p-4">
         <TouchableOpacity onPress={() => router.back()}>

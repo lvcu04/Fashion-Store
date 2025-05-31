@@ -1,29 +1,16 @@
 import { View, Text,ScrollView,TouchableOpacity} from 'react-native'
 import React from 'react'
 
-const Categories = () => {
-    const categories = [
-    {
-      id: 1,
-      name: 'T-Shirts',
-     
-    },
-    {
-      id: 2,
-      name: 'Jackets',
-      
-    },
-    {
-      id: 3,
-      name: 'Jeans',
-     
-    },
-    {
-      id: 4,
-      name: 'Shoese',
-     
-    },
-  ];
+interface Category {
+  id: number;
+  categoryName: string;
+}
+interface CategorysProps {
+  categories: Category[];
+}
+
+const Categories: React.FC<CategorysProps> = ( {categories} ) => {
+
   return (
     <>
     <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-2">
@@ -33,7 +20,7 @@ const Categories = () => {
             key={category.id}
             className="bg-gray-100 p-3 rounded-full mr-3"
             >
-            <Text className="text-gray-700">{category.name}</Text>
+            <Text className="text-gray-700">{category.categoryName}</Text>
             </View>
         ))}
         </TouchableOpacity>

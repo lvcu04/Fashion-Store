@@ -18,7 +18,7 @@ const Favourite = () => {
 
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
-
+  
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: withTiming(scale.value, { duration: 150, easing: Easing.ease }) }],
@@ -104,7 +104,7 @@ const Favourite = () => {
   );
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className= 'flex-1 bg-gray-50 '>
       <View className="flex-row justify-between items-center px-5 pt-6 pb-4 bg-white shadow-sm">
         <Text className="text-3xl font-bold text-gray-900">Favourite</Text>
       </View>

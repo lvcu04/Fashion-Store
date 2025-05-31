@@ -102,7 +102,7 @@ const SettingItem: React.FC<SettingItemProps> = ({
 };
 
 const UserProfile = () => {
-  const { user } = useAuth();
+  const { firebaseUser } = useAuth();
   const logoutScale = useSharedValue(1);
   const logoutOpacity = useSharedValue(1);
   const [notifications, setNotifications] = React.useState(true);
@@ -160,7 +160,7 @@ const UserProfile = () => {
           <View className="bg-white rounded-xl p-4 shadow-md border border-gray-200">
             <Text className="text-sm text-gray-600 font-medium">Full Name</Text>
             <Text className="text-xl font-bold text-gray-900">
-              {user?.displayName || "Fscreation"}
+              {firebaseUser?.displayName || "Fscreation"}
             </Text>
           </View>
           <View className="bg-white rounded-xl p-4 shadow-md border border-gray-200">

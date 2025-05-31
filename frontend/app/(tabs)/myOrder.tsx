@@ -17,6 +17,8 @@ type OrderItem = {
 };
 
 const MyOrder = () => {
+
+  
   const [activeTab, setActiveTab] = useState<'Ongoing' | 'Completed'>('Ongoing');
   const [orders, setOrders] = useState<{
     Ongoing: OrderItem[];
@@ -141,7 +143,7 @@ const MyOrder = () => {
   );
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className='flex-1 bg-gray-50'>
       <View className="bg-white shadow-sm p-5">
         <Text className="text-3xl font-bold text-gray-900">My Orders</Text>
         <View className="flex-row mt-5">

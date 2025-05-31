@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { type } = require('os');
 
 const productSchema = new mongoose.Schema({
   product_id: {
@@ -14,6 +15,7 @@ const productSchema = new mongoose.Schema({
   },
   image: {
     type: String,
+    required: false,
     default: '',
   },
   description: {
@@ -42,7 +44,25 @@ const productSchema = new mongoose.Schema({
  category_id: {
   type: String,
   required: true,
-}
+},
+status: {
+  type: String,
+  enum: ['Stock', 'UnStock'],
+  default: 'Stock',
+},
+quantity: {
+  type: Number,
+  required: true,
+},
+
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 
 }, { timestamps: true, versionKey: false });
 

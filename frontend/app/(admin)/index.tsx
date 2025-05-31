@@ -1,5 +1,5 @@
 import { useAuth } from "@/context/authContext";
-import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import {  Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Image, ScrollView, TouchableOpacity, View } from "react-native";
@@ -15,7 +15,7 @@ type AdminRoute =
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { firebaseUser,logout } = useAuth();
   const [summary, setSummary] = useState({
     products: 156,
     orders: 45,
@@ -23,40 +23,51 @@ export default function AdminDashboard() {
     revenue: 12000,
   });
 
-  const menuItems = [
-    {
-      id: "products",
-      title: "Sản phẩm",
-      icon: "shirt",
-      count: summary.products,
-      color: "#4F46E5",
-      route: "/(admin)/products" as AdminRoute,
-    },
-    {
-      id: "orders",
-      title: "Đơn hàng",
-      icon: "cart",
-      count: summary.orders,
-      color: "#10B981",
-      route: "/(admin)/orders" as AdminRoute,
-    },
-    {
-      id: "users",
-      title: "Người dùng",
-      icon: "users",
-      count: summary.users,
-      color: "#F59E0B",
-      route: "/(admin)/users" as AdminRoute,
-    },
-    {
-      id: "revenue",
-      title: "Doanh thu",
-      icon: "chart-line",
-      count: summary.revenue.toLocaleString() + "₫",
-      color: "#EF4444",
-      route: "/(admin)/revenue" as AdminRoute,
-    },
-  ];
+// Define the type for MaterialIcons icon names using the correct union type
+type MaterialIconName = keyof typeof MaterialIcons.glyphMap;
+
+const menuItems: {
+  id: string;
+  title: string;
+  icon: MaterialIconName;
+  count: number | string;
+  color: string;
+  route: AdminRoute;
+}[] = [
+  {
+    id: "products",
+    title: "Sản phẩm",
+    icon: "inventory-2",
+    count: summary.products,
+    color: "#4F46E5",
+    route: "/(admin)/products",
+  },
+  {
+    id: "orders",
+    title: "Đơn hàng",
+    icon: "receipt-long",
+    count: summary.orders,
+    color: "#10B981",
+    route: "/(admin)/orders",
+  },
+  {
+    id: "users",
+    title: "Người dùng",
+    icon: "person",
+    count: summary.users,
+    color: "#F59E0B",
+    route: "/(admin)/users",
+  },
+  {
+    id: "revenue",
+    title: "Doanh thu",
+    icon: "attach-money",
+    count: summary.revenue.toLocaleString() + "₫",
+    color: "#EF4444",
+    route: "/(admin)/revenue",
+  },
+];
+
 
   return (
     <View className="flex-1 bg-gray-50">
@@ -65,12 +76,12 @@ export default function AdminDashboard() {
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center">
             <Image
-              source={{ uri: user?.photoURL || "https://i.pravatar.cc/100" }}
+              source={{ uri: firebaseUser?.photoURL || "https://i.pravatar.cc/100" }}
               className="w-12 h-12 rounded-full mr-3"
             />
             <View>
               <Text className="text-2xl font-bold text-gray-800">
-                Xin chào, {user?.displayName || "Admin"}!
+                Xin chào, {firebaseUser?.displayName || "Admin"}!
               </Text>
               <Text className="text-gray-500">Chào mừng trở lại</Text>
             </View>
@@ -85,6 +96,9 @@ export default function AdminDashboard() {
             </TouchableOpacity>
             <TouchableOpacity className="w-10 h-10 items-center justify-center rounded-full bg-gray-100">
               <Ionicons name="settings-outline" size={24} color="#4B5563" />
+            </TouchableOpacity>
+            <TouchableOpacity className="w-10 h-10 items-center justify-center rounded-full bg-gray-100">
+              <Ionicons name="power" size={24} color="#4B5563" onPress={logout} />
             </TouchableOpacity>
           </View>
         </View>
@@ -104,7 +118,7 @@ export default function AdminDashboard() {
                   className="w-12 h-12 rounded-full items-center justify-center"
                   style={{ backgroundColor: item.color + "20" }}
                 >
-                  <FontAwesome5 name={item.icon} size={20} color={item.color} />
+                  <MaterialIcons name={item.icon} size={20} color={item.color} />
                 </View>
                 <Text
                   className="text-2xl font-bold"
@@ -169,7 +183,7 @@ export default function AdminDashboard() {
               className="w-[48%] bg-white rounded-xl p-4 mb-4 shadow-sm items-center"
             >
               <View className="w-12 h-12 rounded-full bg-blue-100 items-center justify-center mb-2">
-                <Ionicons name="add-circle-outline" size={24} color="#4F46E5" />
+                <MaterialIcons name="add-box" size={24} color="#4F46E5" />
               </View>
               <Text className="text-gray-800 font-medium">Thêm sản phẩm</Text>
             </TouchableOpacity>
@@ -179,7 +193,7 @@ export default function AdminDashboard() {
               className="w-[48%] bg-white rounded-xl p-4 mb-4 shadow-sm items-center"
             >
               <View className="w-12 h-12 rounded-full bg-green-100 items-center justify-center mb-2">
-                <Ionicons name="create-outline" size={24} color="#10B981" />
+                <MaterialIcons name="playlist-add" size={24} color="#10B981" />
               </View>
               <Text className="text-gray-800 font-medium">Tạo đơn hàng</Text>
             </TouchableOpacity>
