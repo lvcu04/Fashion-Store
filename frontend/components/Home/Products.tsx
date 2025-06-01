@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 
 type Product = {
-  id: number;
+  product_id: string;
   image: string;
   productName: string;
   price: number;
@@ -22,17 +22,18 @@ const Products: React.FC<ProductsProps> = ({ products, onAddFavourite , favourit
   return (
     <View className="flex-row flex-wrap justify-between px-1">
       {products.map((product) => (
+        console.log('Rendering product:', product),
+        
+
         <TouchableOpacity
-           key={product.id?.toString() || Math.random().toString()}
+          key={product.product_id}
           className="bg-white rounded-xl shadow-md mb-4 w-[48%] overflow-hidden border border-gray-200"
           style={{ elevation: 3 }}
           onPress={() => {
-            router.push({
-              pathname: '/productDetails/[id]',
-              params: { id: product.id },
-            });
+            router.push(`/productDetails/${product.product_id}`);
           }}
         >
+          
           <View className="relative">
             <Image
               source={{ uri: product.image }}
@@ -44,9 +45,9 @@ const Products: React.FC<ProductsProps> = ({ products, onAddFavourite , favourit
               className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/70 items-center justify-center"
             >
              <MaterialIcons
-                name={favourites.some(item => item.id === product.id) ? 'favorite' : 'favorite-border'}
+                name={favourites.some(item => item.product_id === product.product_id) ? 'favorite' : 'favorite-border'}
                 size={18}
-                color={favourites.some(item => item.id === product.id) ? '#FF0000' : '#fff'}
+                color={favourites.some(item => item.product_id === product.product_id) ? '#FF0000' : '#fff'}
               />
             </TouchableOpacity>
           </View>
@@ -55,7 +56,7 @@ const Products: React.FC<ProductsProps> = ({ products, onAddFavourite , favourit
               {typeof product.productName === 'string' ? product.productName : 'Unknown Product'}
             </Text>
             <Text className="text-gray-900 text-sm font-semibold mt-1">
-              ${typeof product.price === 'number' ? product.price.toFixed(2) : '0.00'}
+              {product.price.toLocaleString("vi-VN")}VNĐ
             </Text>
           </View>
         </TouchableOpacity>

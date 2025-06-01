@@ -10,7 +10,7 @@ import Products from '@/components/Home/Products';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API } from '@/constants/api';
 type Product = {
-  id: number;
+  id: string;
   productName: string;
   price: number;
   image: string;

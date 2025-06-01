@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export type Product = {
-  id: number;
+  id: string;
   title: string;
   price: number;
   image: string;
@@ -14,7 +14,7 @@ export type Product = {
 type FavouriteContextType = {
   favourites: Product[];
   addFavourite: (product: Product) => void;
-  removeFavourite: (id: number) => void;
+  removeFavourite: (id: string) => void;
   
 };
 
@@ -29,7 +29,7 @@ export const FavouriteProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
-  const removeFavourite = (id: number) => {
+  const removeFavourite = (id: string) => {
     setFavourites((prev) => prev.filter((item) => item.id !== id));
   };
 

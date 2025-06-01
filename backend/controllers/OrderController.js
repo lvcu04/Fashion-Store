@@ -1,5 +1,5 @@
 const { get } = require('http');
-const OrderProduct = require('../models/OrderProduct');
+const OrderProduct = require('../models/Order');
 const Product = require('../models/Product');  
 const Transaction = require('../models/Transaction');
 

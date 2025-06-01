@@ -47,7 +47,7 @@ const Favourite = () => {
     }
   };
 
-  const removeFavourite = async (id: number) => {
+  const removeFavourite = async (id: string) => {
     const newList = favourites.filter((item) => item.id !== id);
     setFavourites(newList);
     try {
