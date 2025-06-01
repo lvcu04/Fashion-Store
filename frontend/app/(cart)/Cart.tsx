@@ -1,6 +1,7 @@
-import { AntDesign } from '@expo/vector-icons';
-import React, { useState } from 'react';
-import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import { AntDesign } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import { useRouter } from "expo-router";
 
 type CartItem = {
   id: string;
@@ -13,37 +14,36 @@ type CartItem = {
 };
 
 const MyCart = () => {
+  const router = useRouter();
   const [cartItems, setCartItems] = useState<CartItem[]>([
     {
-      id: '1',
-        title: 'Soludos Ibiza Classic Lace Sneakers',
-        price: 120.00,
-        quantity: 1,
-        size: 42,
-        color: '#d1d5db',
-        image: 'https://via.placeholder.com/150/FF6F61/FFFFFF?text=Sneakers',
+      id: "1",
+      title: "Soludos Ibiza Classic Lace Sneakers",
+      price: 120.0,
+      quantity: 1,
+      size: 42,
+      color: "#d1d5db",
+      image: "https://via.placeholder.com/150/FF6F61/FFFFFF?text=Sneakers",
     },
     {
-      id: '2',
-        title: 'Beats Solo3 Wireless Kulak',
-        price: 50.00,
-        quantity: 1,
-        size: 'M',
-        color: '#000000',
-        image: 'https://via.placeholder.com/150/4A90E2/FFFFFF?text=Headphone',
+      id: "2",
+      title: "Beats Solo3 Wireless Kulak",
+      price: 50.0,
+      quantity: 1,
+      size: "M",
+      color: "#000000",
+      image: "https://via.placeholder.com/150/4A90E2/FFFFFF?text=Headphone",
     },
     {
-      id: '3',
-        title: 'Leather Crossbody Bag',
-        price: 89.50,
-        quantity: 1,
-        size: 'One Size',
-        color: '#50C878',
-        image: 'https://via.placeholder.com/150/50C878/FFFFFF?text=Bag',
+      id: "3",
+      title: "Leather Crossbody Bag",
+      price: 89.5,
+      quantity: 1,
+      size: "One Size",
+      color: "#50C878",
+      image: "https://via.placeholder.com/150/50C878/FFFFFF?text=Bag",
     },
   ]);
-
- 
 
   const updateQuantity = (id: string, delta: number) => {
     setCartItems((prevItems) =>
@@ -73,9 +73,13 @@ const MyCart = () => {
         resizeMode="contain"
       />
       <View className="ml-4 flex-1">
-        <Text className="text-lg font-semibold text-gray-900">{item.title}</Text>
+        <Text className="text-lg font-semibold text-gray-900">
+          {item.title}
+        </Text>
         <View className="flex-row mt-1">
-          <Text className="text-sm text-gray-600">Quantity: {item.quantity}</Text>
+          <Text className="text-sm text-gray-600">
+            Quantity: {item.quantity}
+          </Text>
           <Text className="text-sm text-gray-600 ml-4">Size: {item.size}</Text>
         </View>
         <View className="flex-row items-center mt-1">
@@ -112,9 +116,11 @@ const MyCart = () => {
 
   return (
     <View className="flex-1 bg-gray-50">
-      {/* Header giữ nguyên từ My Order */}
-      <View className="bg-white shadow-sm p-5">
-        <Text className="text-3xl font-bold text-gray-900">My Cart</Text>
+      <View className="bg-white pt-12 pb-4 px-5 flex-row items-center">
+        <TouchableOpacity onPress={() => router.push("/profile")}>
+          <AntDesign name="arrowleft" size={24} color="#000000" />
+        </TouchableOpacity>
+        <Text className="text-3xl font-bold text-black ml-4">My Cart</Text>
       </View>
 
       {cartItems.length === 0 ? (
@@ -137,18 +143,25 @@ const MyCart = () => {
             showsVerticalScrollIndicator={false}
           />
           <View className="bg-white p-5 shadow-sm">
-            
             <View className="flex-row justify-between items-center mb-4">
               <Text className="text-lg text-gray-600">
-                Total ({cartItems.length} item{cartItems.length > 1 ? 's' : ''}):
+                Total ({cartItems.length} item{cartItems.length > 1 ? "s" : ""}
+                ):
               </Text>
               <Text className="text-2xl font-bold text-gray-900">
                 ${totalPrice.toFixed(2)}
               </Text>
             </View>
             <TouchableOpacity className="bg-gray-900 rounded-full py-4 flex-row items-center justify-center">
-              <Text className="text-white font-semibold text-lg">Proceed to Checkout</Text>
-              <AntDesign name="arrowright" size={20} color="white" style={{ marginLeft: 8 }} />
+              <Text className="text-white font-semibold text-lg">
+                Proceed to Checkout
+              </Text>
+              <AntDesign
+                name="arrowright"
+                size={20}
+                color="white"
+                style={{ marginLeft: 8 }}
+              />
             </TouchableOpacity>
           </View>
         </>

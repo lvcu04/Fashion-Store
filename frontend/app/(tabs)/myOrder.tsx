@@ -1,7 +1,13 @@
-import { AntDesign } from '@expo/vector-icons';
-import React, { useState } from 'react';
-import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { AntDesign } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { useRouter } from "expo-router";
 
 type OrderItem = {
   id: string;
@@ -17,63 +23,73 @@ type OrderItem = {
 };
 
 const MyOrder = () => {
-
-  
-  const [activeTab, setActiveTab] = useState<'Ongoing' | 'Completed'>('Ongoing');
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<"Ongoing" | "Completed">(
+    "Ongoing"
+  );
   const [orders, setOrders] = useState<{
     Ongoing: OrderItem[];
     Completed: OrderItem[];
   }>({
     Ongoing: [
       {
-        id: '1',
-        title: 'Soludos Ibiza Classic Lace Sneakers',
-        price: 120.00,
+        id: "1",
+        title: "Soludos Ibiza Classic Lace Sneakers",
+        price: 120.0,
         quantity: 1,
         size: 42,
-        color: '#d1d5db',
-        image: 'https://via.placeholder.com/150/FF6F61/FFFFFF?text=Sneakers',
-        orderDate: 'May 15, 2025',
-        orderId: 'ORD12345',
-        status: 'Processing',
+        color: "#d1d5db",
+        image: "https://via.placeholder.com/150/FF6F61/FFFFFF?text=Sneakers",
+        orderDate: "May 15, 2025",
+        orderId: "ORD12345",
+        status: "Processing",
       },
       {
-        id: '2',
-        title: 'Beats Solo3 Wireless Kulak',
-        price: 50.00,
+        id: "2",
+        title: "Beats Solo3 Wireless Kulak",
+        price: 50.0,
         quantity: 1,
-        size: 'M',
-        color: '#000000',
-        image: 'https://via.placeholder.com/150/4A90E2/FFFFFF?text=Headphone',
-        orderDate: 'May 14, 2025',
-        orderId: 'ORD12346',
-        status: 'Shipped',
+        size: "M",
+        color: "#000000",
+        image: "https://via.placeholder.com/150/4A90E2/FFFFFF?text=Headphone",
+        orderDate: "May 14, 2025",
+        orderId: "ORD12346",
+        status: "Shipped",
       },
     ],
     Completed: [
       {
-        id: '3',
-        title: 'Leather Crossbody Bag',
-        price: 89.50,
+        id: "3",
+        title: "Leather Crossbody Bag",
+        price: 89.5,
         quantity: 1,
-        size: 'One Size',
-        color: '#50C878',
-        image: 'https://via.placeholder.com/150/50C878/FFFFFF?text=Bag',
-        orderDate: 'May 10, 2025',
-        orderId: 'ORD12347',
-        status: 'Delivered',
+        size: "One Size",
+        color: "#50C878",
+        image: "https://via.placeholder.com/150/50C878/FFFFFF?text=Bag",
+        orderDate: "May 10, 2025",
+        orderId: "ORD12347",
+        status: "Delivered",
       },
     ],
   });
 
-  // Animated values for press effect
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ scale: withTiming(scale.value, { duration: 150, easing: Easing.ease }) }],
-      opacity: withTiming(opacity.value, { duration: 150, easing: Easing.ease }),
+      transform: [
+        {
+          scale: withTiming(scale.value, {
+            duration: 150,
+            easing: Easing.ease,
+          }),
+        },
+      ],
+      opacity: withTiming(opacity.value, {
+        duration: 150,
+        easing: Easing.ease,
+      }),
     };
   });
 
@@ -97,10 +113,16 @@ const MyOrder = () => {
           resizeMode="contain"
         />
         <View className="ml-4 flex-1">
-          <Text className="text-lg font-semibold text-gray-900">{item.title}</Text>
+          <Text className="text-lg font-semibold text-gray-900">
+            {item.title}
+          </Text>
           <View className="flex-row mt-1">
-            <Text className="text-sm text-gray-600">Quantity: {item.quantity}</Text>
-            <Text className="text-sm text-gray-600 ml-4">Size: {item.size}</Text>
+            <Text className="text-sm text-gray-600">
+              Quantity: {item.quantity}
+            </Text>
+            <Text className="text-sm text-gray-600 ml-4">
+              Size: {item.size}
+            </Text>
           </View>
           <View className="flex-row items-center mt-1">
             <Text className="text-sm text-gray-600">Color: </Text>
@@ -109,18 +131,24 @@ const MyOrder = () => {
               className="w-5 h-5 rounded-full border border-gray-300"
             />
           </View>
-          <Text className="text-xl font-bold text-gray-800 mt-2">${item.price.toFixed(2)}</Text>
+          <Text className="text-xl font-bold text-gray-800 mt-2">
+            ${item.price.toFixed(2)}
+          </Text>
         </View>
       </View>
       <View className="border-t border-gray-200 mt-4 pt-3">
         <View className="flex-row justify-between">
           <View>
-            <Text className="text-sm text-gray-500">Order Date: {item.orderDate}</Text>
-            <Text className="text-sm text-gray-500">Order ID: {item.orderId}</Text>
+            <Text className="text-sm text-gray-500">
+              Order Date: {item.orderDate}
+            </Text>
+            <Text className="text-sm text-gray-500">
+              Order ID: {item.orderId}
+            </Text>
           </View>
           <Text
             className={`text-sm font-semibold ${
-              item.status === 'Delivered' ? 'text-green-600' : 'text-orange-500'
+              item.status === "Delivered" ? "text-green-600" : "text-orange-500"
             }`}
           >
             {item.status}
@@ -134,7 +162,7 @@ const MyOrder = () => {
           >
             <AntDesign name="eye" size={16} color="white" />
             <Text className="text-white font-semibold ml-2">
-              {activeTab === 'Ongoing' ? 'Track Order' : 'View Details'}
+              {activeTab === "Ongoing" ? "Track Order" : "View Details"}
             </Text>
           </TouchableOpacity>
         </Animated.View>
@@ -143,33 +171,38 @@ const MyOrder = () => {
   );
 
   return (
-    <View className='flex-1 bg-gray-50'>
-      <View className="bg-white shadow-sm p-5">
-        <Text className="text-3xl font-bold text-gray-900">My Orders</Text>
+    <View className="flex-1 bg-gray-50">
+      <View className="bg-white pt-12 pb-4 px-5 flex-row items-center">
+        <TouchableOpacity onPress={() => router.push("/profile")}>
+          <AntDesign name="arrowleft" size={24} color="#000000" />
+        </TouchableOpacity>
+        <Text className="text-3xl font-bold text-black ml-4">My Orders</Text>
+      </View>
+      <View className="bg-white px-5 pb-5">
         <View className="flex-row mt-5">
           <TouchableOpacity
-            onPress={() => setActiveTab('Ongoing')}
+            onPress={() => setActiveTab("Ongoing")}
             className={`flex-1 py-3 rounded-full mr-3 ${
-              activeTab === 'Ongoing' ? 'bg-gray-900' : 'bg-gray-200'
+              activeTab === "Ongoing" ? "bg-gray-900" : "bg-gray-200"
             }`}
           >
             <Text
               className={`text-center font-semibold ${
-                activeTab === 'Ongoing' ? 'text-white' : 'text-gray-700'
+                activeTab === "Ongoing" ? "text-white" : "text-gray-700"
               }`}
             >
               Ongoing
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setActiveTab('Completed')}
+            onPress={() => setActiveTab("Completed")}
             className={`flex-1 py-3 rounded-full ${
-              activeTab === 'Completed' ? 'bg-gray-900' : 'bg-gray-200'
+              activeTab === "Completed" ? "bg-gray-900" : "bg-gray-200"
             }`}
           >
             <Text
               className={`text-center font-semibold ${
-                activeTab === 'Completed' ? 'text-white' : 'text-gray-700'
+                activeTab === "Completed" ? "text-white" : "text-gray-700"
               }`}
             >
               Completed
@@ -192,7 +225,11 @@ const MyOrder = () => {
           data={orders[activeTab]}
           renderItem={renderOrderItem}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 24 }}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingTop: 16,
+            paddingBottom: 24,
+          }}
           showsVerticalScrollIndicator={false}
         />
       )}

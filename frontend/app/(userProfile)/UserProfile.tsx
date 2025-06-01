@@ -8,8 +8,10 @@ import {
   Switch,
   ScrollView,
   StatusBar,
+  Modal,
+  FlatList,
 } from "react-native";
-
+import { useRouter } from "expo-router";
 import { Feather, AntDesign, Ionicons } from "@expo/vector-icons";
 import Animated, {
   useAnimatedStyle,
@@ -70,7 +72,7 @@ const SettingItem: React.FC<SettingItemProps> = ({
         onPressIn={() => handlePress(true)}
         onPressOut={() => handlePress(false)}
         onPress={onPress}
-        className="flex-row justify-between items-center p-4 bg-white rounded-xl shadow-md border border-gray-200"
+        className="flex-row justify-between items-center p-4 bg-white rounded-2xl border border-gray-200"
       >
         <View className="flex-row items-center space-x-3">
           <View className={`${iconBgColor} p-2 rounded-lg`}>{icon}</View>
@@ -102,12 +104,24 @@ const SettingItem: React.FC<SettingItemProps> = ({
 };
 
 const UserProfile = () => {
-  const { firebaseUser } = useAuth();
+  const router = useRouter();
+  const { userProfile } = useAuth();
   const logoutScale = useSharedValue(1);
   const logoutOpacity = useSharedValue(1);
   const [notifications, setNotifications] = React.useState(true);
   const [darkMode, setDarkMode] = React.useState(false);
   const [gender, setGender] = React.useState("Male");
+  const [selectedLanguage, setSelectedLanguage] = React.useState("English");
+  const [isLanguageModalVisible, setLanguageModalVisible] =
+    React.useState(false);
+
+  const languages = [
+    { id: "1", name: "English" },
+    { id: "2", name: "Spanish" },
+    { id: "3", name: "French" },
+    { id: "4", name: "German" },
+    { id: "5", name: "Vietnamese" },
+  ];
 
   const logoutAnimatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -129,6 +143,22 @@ const UserProfile = () => {
     logoutOpacity.value = isIn ? 0.8 : 1;
   };
 
+  const renderLanguageItem = ({
+    item,
+  }: {
+    item: { id: string; name: string };
+  }) => (
+    <TouchableOpacity
+      onPress={() => {
+        setSelectedLanguage(item.name);
+        setLanguageModalVisible(false);
+      }}
+      className="p-4 border-b border-gray-200"
+    >
+      <Text className="text-lg text-gray-800">{item.name}</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <ScrollView className="flex-1 bg-transparent">
       <StatusBar
@@ -136,7 +166,13 @@ const UserProfile = () => {
         backgroundColor="transparent"
         translucent
       />
-      <View className="rounded-b-3xl pt-12 pb-8 px-5 shadow-lg bg-white">
+      <View className="bg-white pt-12 pb-4 px-5 flex-row items-center">
+        <TouchableOpacity onPress={() => router.back()}>
+          <AntDesign name="arrowleft" size={24} color="#000000" />
+        </TouchableOpacity>
+        <Text className="text-3xl font-bold text-black ml-4">User Profile</Text>
+      </View>
+      <View className="rounded-b-3xl pt-4 pb-8 px-5 bg-white">
         <View className="items-center mb-6">
           <View className="relative">
             <View className="w-32 h-32 rounded-full border-4 border-gray-200 shadow-lg overflow-hidden">
@@ -156,21 +192,21 @@ const UserProfile = () => {
             Tap to change photo
           </Text>
         </View>
-        <View className="space-y-6">
-          <View className="bg-white rounded-xl p-4 shadow-md border border-gray-200">
+        <View className="space-y-4">
+          <View className="bg-white rounded-2xl p-3 shadow-md border border-gray-200 min-h-[60px]">
             <Text className="text-sm text-gray-600 font-medium">Full Name</Text>
             <Text className="text-xl font-bold text-gray-900">
-              {firebaseUser?.displayName || "Fscreation"}
+              {userProfile.name || ""}
             </Text>
           </View>
-          <View className="bg-white rounded-xl p-4 shadow-md border border-gray-200">
-            <Text className="text-sm text-gray-600 font-medium mb-3">
+          <View className="bg-white rounded-2xl p-3 shadow-md border border-gray-200 min-h-[60px]">
+            <Text className="text-sm text-gray-600 font-medium mb-2">
               Gender
             </Text>
-            <View className="flex-row justify-between">
+            <View className="flex-row justify-between space-x-3">
               <TouchableOpacity
                 onPress={() => setGender("Male")}
-                className={`flex-row items-center space-x-2 px-4 py-2 rounded-lg flex-1 mr-2 ${
+                className={`flex-row items-center space-x-2 px-3 py-1 rounded-lg flex-1 ${
                   gender === "Male" ? "bg-gray-100" : "bg-white"
                 } border border-gray-200`}
               >
@@ -193,7 +229,7 @@ const UserProfile = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => setGender("Female")}
-                className={`flex-row items-center space-x-2 px-4 py-2 rounded-lg flex-1 ml-2 ${
+                className={`flex-row items-center space-x-2 px-3 py-1 rounded-lg flex-1 ${
                   gender === "Female" ? "bg-gray-100" : "bg-white"
                 } border border-gray-200`}
               >
@@ -218,27 +254,25 @@ const UserProfile = () => {
               </TouchableOpacity>
             </View>
           </View>
-          <View className="flex-row space-x-4">
-            <View className="bg-white rounded-xl p-4 shadow-md border border-gray-200 flex-1">
-              <Text className="text-sm text-gray-600 font-medium">Age</Text>
-              <Text className="text-lg font-bold text-gray-900">22 Years</Text>
-            </View>
-            <View className="bg-white rounded-xl p-4 shadow-md border border-gray-200 flex-1">
-              <Text className="text-sm text-gray-600 font-medium">Email</Text>
-              <Text
-                className="text-lg font-bold text-gray-900"
-                numberOfLines={1}
-              >
-                Fscreation441@gmail.com
-              </Text>
-            </View>
+          <View className="bg-white rounded-2xl p-3 shadow-md border border-gray-200 min-h-[60px]">
+            <Text className="text-sm text-gray-600 font-medium">Age</Text>
+            <Text className="text-lg font-bold text-gray-900">22 Years</Text>
+          </View>
+          <View className="bg-white rounded-2xl p-3 shadow-md border border-gray-200 min-h-[60px]">
+            <Text className="text-sm text-gray-600 font-medium">Email</Text>
+            <Text className="text-lg font-bold text-gray-900" numberOfLines={1}>
+              {userProfile?.email || ""}
+            </Text>
           </View>
         </View>
       </View>
       <View className="mt-8 px-5">
         <View className="flex-row items-center mb-5">
           <Ionicons name="settings-outline" size={22} color="#6366f1" />
-          <Text className="text-xl font-bold text-gray-900 ml-2">Settings</Text>
+          <View className="ml-2">
+            <Text className="text-2xl font-bold text-gray-900">Settings</Text>
+            <View className="border-b-2 border-gray-300 w-1/2 mt-1" />
+          </View>
         </View>
         <View className="space-y-6">
           {[
@@ -247,7 +281,8 @@ const UserProfile = () => {
                 <Ionicons name="language-outline" size={22} color="#6366f1" />
               ),
               title: "Language",
-              rightText: "English",
+              onPress: () => setLanguageModalVisible(true),
+              rightText: selectedLanguage,
               iconBgColor: "bg-indigo-100",
             },
             {
@@ -313,6 +348,32 @@ const UserProfile = () => {
           </TouchableOpacity>
         </Animated.View>
       </View>
+
+      <Modal
+        visible={isLanguageModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLanguageModalVisible(false)}
+      >
+        <View className="flex-1 justify-center bg-black/50">
+          <View className="bg-white rounded-xl mx-5 p-4 max-h-[80%]">
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-xl font-bold text-gray-900">
+                Select Language
+              </Text>
+              <TouchableOpacity onPress={() => setLanguageModalVisible(false)}>
+                <AntDesign name="close" size={24} color="#000000" />
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={languages}
+              renderItem={renderLanguageItem}
+              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
+            />
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
