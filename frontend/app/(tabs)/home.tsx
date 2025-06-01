@@ -10,14 +10,15 @@ import Products from '@/components/Home/Products';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API } from '@/constants/api';
 type Product = {
-  id: string;
+  product_id: string;
   productName: string;
   price: number;
   image: string;
+  category_id: string;
 };
 
 interface Category {
-  id: number;
+  category_id: string;
   categoryName: string;
 }
 
@@ -28,7 +29,13 @@ export default function HomeScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [favourites, setFavourites] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
+
+  const selectedCategory = categories.find(cat => cat.category_id === selectedCategoryId);
+
+
+  const filteredProducts = selectedCategoryId ? products.filter(product => product.category_id === selectedCategoryId) : products;
 
 
   const handleAddFavourite = async (item: Product) => {
@@ -54,22 +61,23 @@ export default function HomeScreen() {
 
     
   const fetchCategories = async () => {
-      try {
-        const response = await fetch('http://192.168.217.1:5000/api/category/allCategory');
-        const data = await response.json();
+  try {
+    const response = await fetch(API.category.all);
+    const data = await response.json();
 
-        console.log('Fetched categories:', data);
-        
+    const formattedCategories: Category[] = data.map((category: any): Category => ({
+      category_id: category.category_id,
+      categoryName: category.categoryName.charAt(0).toUpperCase() + category.categoryName.slice(1),
+    }));
 
-        const formattedCategories: Category[] = data.map((category: any, index: number): Category => ({
-          id: index + 1,
-          categoryName: category.categoryName.charAt(0).toUpperCase() + category.categoryName.slice(1),
-        }));
-        setCategories(formattedCategories);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      }
-    };
+    // Thêm "All" vào đầu danh sách
+    const allCategory: Category = { category_id: '', categoryName: 'All' };
+    setCategories([allCategory, ...formattedCategories]);
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+  }
+};
+
 
  
 
@@ -134,17 +142,21 @@ export default function HomeScreen() {
         {/* Categories */}
         <View className="mb-4">
           <Text className="font-bold text-lg">Categories</Text>
-          <Categories categories={categories} />
+          <Categories categories={categories} onCategorySelect={setSelectedCategoryId} />
         </View>
 
         {/* Top T-Shirt */}
         <View className="flex-row justify-between items-center mb-2">
-          <Text className="font-bold text-lg">Top T-Shirt</Text>
+          <Text className="font-bold text-lg">
+            {selectedCategoryId === '' || selectedCategoryId === null
+              ? 'Top Products'
+              : `Top ${selectedCategory?.categoryName}`}
+          </Text>
           <Text className="text-gray-500 text-sm">View all</Text>
         </View>
 
         {/* Product List */}
-        <Products products={products} onAddFavourite={handleAddFavourite} favourites={favourites} />
+        <Products products={filteredProducts} onAddFavourite={handleAddFavourite} favourites={favourites} />
       </ScrollView>
     </View>
   );

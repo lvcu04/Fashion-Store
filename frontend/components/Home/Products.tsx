@@ -8,6 +8,7 @@ type Product = {
   image: string;
   productName: string;
   price: number;
+  category_id: string;
 };
 
 interface ProductsProps {
