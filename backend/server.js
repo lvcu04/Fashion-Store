@@ -3,7 +3,7 @@ const { connectDB } = require('./config/db');
 const dotenv = require('dotenv');
 const cors = require('cors');
 
-const UserRouter = require('./routers/userRouter');
+const UserRouter = require('./routers/UserRouter');
 const productRouter = require('./routers/ProductRouter');
 const categoryRouter = require('./routers/CategoryRouter');
 const OrderRouter = require('./routers/OrderRouter');

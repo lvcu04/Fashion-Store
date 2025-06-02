@@ -14,6 +14,8 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
+import { API } from "@/constants/api";
+
 
 // Interface định nghĩa kiểu dữ liệu cho context
 interface AuthContextType {
@@ -48,7 +50,7 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const fetchRole = async (user: User) => {
     try {
       const token = await user.getIdToken();
-      const response = await fetch("http://192.168.217.1:5000/api/user/role", {
+      const response = await fetch(`${API.user.role}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -66,13 +68,15 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   // Lấy thông tin user từ backend
   const fetchUserProfile = async (user: User) => {
     try {
-      const response = await fetch(`http://192.168.217.1:5000/api/user?uid=${user.uid}`);
+      const response = await fetch(`${API.user.getById(user.uid)}`);
       if (!response.ok) throw new Error("Failed to fetch user profile");
       const data = await response.json();
       setUserProfile(data);
       console.log("Fetched user profile:", data);
     } catch (error) {
-      console.error("Failed to fetch user profile:", error);
+      console.log("Fetching URL:", API.user.getById(user.uid));
+
+      // console.error("Failed to fetch user profile:", error);
       setUserProfile(null);
     }
   };
