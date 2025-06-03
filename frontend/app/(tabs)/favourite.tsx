@@ -47,8 +47,8 @@ const Favourite = () => {
     }
   };
 
-  const removeFavourite = async (id: string) => {
-    const newList = favourites.filter((item) => item.id !== id);
+  const removeFavourite = async (product_id: string) => {
+    const newList = favourites.filter((item) => item.product_id !== product_id);
     setFavourites(newList);
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newList));
@@ -63,7 +63,7 @@ const Favourite = () => {
 
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
-      onPress={() => router.push({ pathname: '/productDetails/[id]', params: { id: item.id } })}
+      onPress={() => router.push({ pathname: '/productDetails/[id]', params: { id: item.product_id } })}
       className="flex-row items-center p-4 bg-white rounded-2xl mb-4 shadow-lg"
     >
       <Image
@@ -74,27 +74,28 @@ const Favourite = () => {
       />
       <View className="ml-4 flex-1">
         <Text className="text-lg font-semibold text-gray-900">
-          {item.title.length > 10 ? item.title.slice(0, 10) + '...' : item.title}
+          {item.productName?.length > 10 ? item.productName.slice(0, 10) + '...' : item.productName}
         </Text>
+
         <View className="flex-row items-center mt-2">
           {[...Array(5)].map((_, index) => (
             <AntDesign
               key={index}
               name="star"
               size={16}
-              color={index < Math.floor(item.rating?.rate ?? 0) ? '#facc15' : '#e5e7eb'}
+              color={index < Math.floor(item.ranking ?? 0) ? '#facc15' : '#e5e7eb'}
             />
           ))}
-          <Text className="text-xs ml-1 text-gray-500">({item.rating?.count ?? 0} Reviews)</Text>
+          <Text className="text-xs ml-1 text-gray-500">({item.reviews?? 0} Reviews)</Text>
         </View>
-        <Text className="text-xl font-bold text-gray-800 mt-2">${item.price.toFixed(2)}</Text>
+        <Text className="text-xl font-bold text-gray-800 mt-2"> {item.price.toLocaleString("vi-VN")}VNĐ</Text>
       </View>
 
       <Animated.View style={animatedStyle}>
         <TouchableOpacity
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
-          onPress={() => removeFavourite(item.id)}
+          onPress={() => removeFavourite(item.product_id)}
           className="p-3 bg-red-500 rounded-full shadow-md"
         >
           <AntDesign name="close" size={12} color="white" />
@@ -123,7 +124,7 @@ const Favourite = () => {
         <FlatList
           data={favourites}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.product_id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 }}
         />

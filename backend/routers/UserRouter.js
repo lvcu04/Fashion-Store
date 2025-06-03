@@ -6,10 +6,10 @@ const authMiddleware = require('../middleware/authMiddleware');
 const router = express.Router();
 
 // Route cụ thể trước
-router.get('/all', authMiddleware.verifyToken, userController.getAllUser);
+router.get('/all', authMiddleware.AdminRight, userController.getAllUser);
 router.get('/role', authMiddleware.getRoleByToken, userController.getRole);
 
 // Route động sau cùng
-router.get('/:uid', authMiddleware.verifyToken, userController.getUser);
+router.get('/',authMiddleware.VerifyToken, userController.getUser);
 
 module.exports = router;

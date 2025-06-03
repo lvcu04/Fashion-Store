@@ -52,7 +52,11 @@ const userController = {
     }
   },
    getUser: async (req, res) => {
-    const { uid } = req.query;
+    const { uid } = req.user;
+    if (!uid) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+    
     try {
         const user = await User.findOne({ uid });
         if (!user) {

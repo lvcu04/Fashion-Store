@@ -1,14 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export type Product = {
-  id: string;
+  product_id: string;
+  productName: string;
+  image: string;
   title: string;
   price: number;
-  image: string;
-  rating?: {
-    rate: number;
-    count: number;
-  };
+
 };
 
 type FavouriteContextType = {
@@ -25,12 +23,12 @@ export const FavouriteProvider = ({ children }: { children: ReactNode }) => {
 
   const addFavourite = (product: Product) => {
     setFavourites((prev) =>
-      prev.find((item) => item.id === product.id) ? prev : [...prev, product]
+      prev.find((item) => item.product_id === product.product_id) ? prev : [...prev, product]
     );
   };
 
-  const removeFavourite = (id: string) => {
-    setFavourites((prev) => prev.filter((item) => item.id !== id));
+  const removeFavourite = (product_id: string) => {
+    setFavourites((prev) => prev.filter((item) => item.product_id !== product_id));
   };
 
   return (

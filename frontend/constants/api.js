@@ -67,6 +67,6 @@ export const API = {
   user: {
     role: `${BASE_URL}/api/user/role`,
     all: `${BASE_URL}/api/user/allUser`,
-    getById: (uid) => `${BASE_URL}/api/user/${uid}`,
+    getById: `${BASE_URL}/api/user/`,
   }
 };

@@ -37,7 +37,7 @@ export default function HomeScreen() {
 
   const filteredProducts = selectedCategoryId ? products.filter(product => product.category_id === selectedCategoryId) : products;
 
-
+  
   const handleAddFavourite = async (item: Product) => {
     await addToFavourites(item);
     await loadFavourites();
@@ -48,7 +48,7 @@ export default function HomeScreen() {
     try {
       const response = await fetch(API.product.all);
       const data = await response.json();
-      console.log('Fetched products:', data);
+      
       setProducts(data);
     } catch (error) {
       console.error('Error fetching products:', error);

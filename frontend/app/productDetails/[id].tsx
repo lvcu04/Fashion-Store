@@ -6,27 +6,27 @@ import { useFavourites } from '@/context/favouriteContext';
 import { API } from '@/constants/api';
 
 type Product = {
-  product_id: string ;
+  product_id: string;
+  productName: string;
   image: string;
   title: string;
   price: number;
 };
 
 const ProductDetailScreen = () => {
-  const { id : productId } = useLocalSearchParams<{ id: string }>();
-  console.log('Product ID:', productId);
+  const { id: productId } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const { favourites, addFavourite, removeFavourite } = useFavourites();
-
+  const [selectedSize, setSelectedSize] = useState<string>('S');
   const toggleFavourite = (product: Product) => {
-    const isFavourite = favourites.some(item => String(item.id) === String(product.product_id));
+    const isFavourite = favourites.some(item => String(item.product_id) === String(product.product_id));
     if (isFavourite) {
       removeFavourite(product.product_id);
     } else {
-      addFavourite({ ...product, id: product.product_id });
+      addFavourite({ ...product, product_id: product.product_id });
     }
   };
 
@@ -41,7 +41,6 @@ const ProductDetailScreen = () => {
       setLoading(false);
     }
   };
-  console.log('Product Data:', data);
 
   useEffect(() => {
     if (productId) {
@@ -65,19 +64,21 @@ const ProductDetailScreen = () => {
     );
   }
 
-  const isFavourite = favourites.some(item => item.id === data.id);
+  const isFavourite = favourites.some(item => String(item.product_id) === String(data.id));
+  const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
   return (
     <>
-      <ScrollView className="flex-1 bg-white">
+      <ScrollView className="flex-1 bg-slate-50">
         {/* Back & Wishlist */}
-        <View className="flex-row justify-between items-center px-4 py-3">
-          <TouchableOpacity onPress={() => router.push('/(tabs)/home')}>
+        <View className="flex-row justify-between items-center px-4 py-2">
+          <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() =>
             toggleFavourite({
               product_id: data.id,
+              productName: data.productName,
               image: data.image,
               title: data.productName,
               price: data.price,
@@ -86,7 +87,7 @@ const ProductDetailScreen = () => {
             <MaterialIcons
               name={isFavourite ? 'favorite' : 'favorite-border'}
               size={25}
-              color="black"
+              color={isFavourite ? 'red' : 'black'}
             />
           </TouchableOpacity>
         </View>
@@ -95,7 +96,7 @@ const ProductDetailScreen = () => {
         <View className="p-5">
           <Image
             source={{ uri: data.image }}
-            style={{ width: '100%', height: 380 }}
+            style={{ width: '100%', height: 320 }}
             className="bg-white my-4"
             resizeMode="contain"
           />
@@ -105,15 +106,37 @@ const ProductDetailScreen = () => {
         <View className="px-5 py-5 rounded-t-3xl bg-white">
           <Text className="text-2xl font-bold">{data.productName}</Text>
 
-          {/* Status */}
+          {/* Rating, Reviews & Status */}
           <View className="flex-row justify-between items-center mt-2">
-            <Text className="text-green-600 font-semibold">{data.status}</Text>
-            <Text className="text-gray-600">Quantity: {data.quantity}</Text>
+            <View className="flex-row items-center">
+              {[...Array(5)].map((_, index) => (
+                <AntDesign
+                  key={index}
+                  name="star"
+                  size={14}
+                  color={index < Math.floor(data.ranking ?? 0) ? '#facc15' : '#d1d5db'}
+                />
+              ))}
+              <Text className="text-xs ml-1">({data.reviews ?? 0} Reviews)</Text>
+            </View>
+            <Text className={`font-semibold ${data.status === 'Stock' ? 'text-green-600' : 'text-red-500'}`}>
+              {data.status}
+            </Text>
           </View>
 
           {/* Size */}
           <Text className="font-bold text-lg mt-4">Size</Text>
-          <Text className="text-base text-gray-800 mt-1">{data.size}</Text>
+          <View className="flex-row flex-wrap mt-2">
+            {sizes.map((size) => (
+              <TouchableOpacity
+                key={size}
+                className={` rounded-full px-4 py-2 m-1 ${selectedSize === size ? 'bg-black' : 'bg-gray-200'}`}
+                onPress={() => setSelectedSize(size)}
+              >
+                <Text className={`${selectedSize === size  ? 'text-white' : ''} text-base font-medium`}>{size}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
           {/* Description */}
           <Text className="font-bold text-lg mt-4">Description</Text>
@@ -136,22 +159,12 @@ const ProductDetailScreen = () => {
                 <Text className="text-xl">+</Text>
               </TouchableOpacity>
             </View>
-            <Text className="text-2xl font-bold">
-              {data.price}đ
-            </Text>
+            <Text className="text-2xl font-bold"> {data.price.toLocaleString("vi-VN")}VNĐ</Text>
           </View>
 
-          {/* Additional Information */}
+          {/* Additional Info */}
           <View className="my-6">
-            <Text className="text-lg font-semibold mb-3">
-              Additional Information
-            </Text>
-
-            <View className="flex-row justify-between mb-2">
-              <Text className="text-gray-600">Category</Text>
-              <Text className="font-medium capitalize">{data.category_id}</Text>
-            </View>
-
+            <Text className="text-lg font-semibold mb-3">Additional Information</Text>
             <View className="flex-row justify-between mb-2">
               <Text className="text-gray-600">Condition</Text>
               <Text className="font-medium">{data.condition}</Text>
@@ -168,8 +181,8 @@ const ProductDetailScreen = () => {
             </View>
 
             <View className="flex-row justify-between">
-              <Text className="text-gray-600">Shipping</Text>
-              <Text className="font-medium">Free</Text>
+              <Text className="text-gray-600">Quantity</Text>
+              <Text className="font-medium">{data.quantity}</Text>
             </View>
           </View>
         </View>
@@ -194,3 +207,4 @@ const ProductDetailScreen = () => {
 };
 
 export default ProductDetailScreen;
+

@@ -23,9 +23,6 @@ const Products: React.FC<ProductsProps> = ({ products, onAddFavourite , favourit
   return (
     <View className="flex-row flex-wrap justify-between px-1">
       {products.map((product) => (
-        console.log('Rendering product:', product),
-        
-
         <TouchableOpacity
           key={product.product_id}
           className="bg-white rounded-xl shadow-md mb-4 w-[48%] overflow-hidden border border-gray-200"

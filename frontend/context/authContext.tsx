@@ -50,6 +50,7 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const fetchRole = async (user: User) => {
     try {
       const token = await user.getIdToken();
+      console.log("Fetching role with token:", token);
       const response = await fetch(`${API.user.role}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -65,18 +66,21 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   };
 
-  // Lấy thông tin user từ backend
+  //Lấy thông tin user từ backend
   const fetchUserProfile = async (user: User) => {
     try {
-      const response = await fetch(`${API.user.getById(user.uid)}`);
+      const token = await user.getIdToken();
+      const response = await fetch(`${API.user.getById}`,{  
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) throw new Error("Failed to fetch user profile");
       const data = await response.json();
       setUserProfile(data);
-      console.log("Fetched user profile:", data);
+     
     } catch (error) {
-      console.log("Fetching URL:", API.user.getById(user.uid));
-
-      // console.error("Failed to fetch user profile:", error);
+      console.error("Failed to fetch user profile:", error);
       setUserProfile(null);
     }
   };

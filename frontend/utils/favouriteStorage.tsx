@@ -6,7 +6,7 @@ export const addToFavourites = async (item: any) => {
   try {
     const existing = await AsyncStorage.getItem(STORAGE_KEY);
     const parsed = existing ? JSON.parse(existing) : [];
-    const exists = parsed.find((p: any) => p.id === item.id);
+    const exists = parsed.find((p: any) => p.product_id === item.product_id);
     if (!exists) {
       const updated = [...parsed, item];
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
