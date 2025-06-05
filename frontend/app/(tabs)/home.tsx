@@ -3,7 +3,7 @@ import { ScrollView, Text, TextInput, View, Image, ActivityIndicator } from 'rea
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/authContext';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
-import { addToFavourites } from '@/utils/favouriteStorage';
+import { addToFavourites, removeFromFavourites } from '@/utils/favouriteStorage';
 import Slider from '@/components/Home/Slider';
 import Categories from '@/components/Home/Categories';
 import Products from '@/components/Home/Products';
@@ -39,9 +39,17 @@ export default function HomeScreen() {
 
   
   const handleAddFavourite = async (item: Product) => {
-    await addToFavourites(item);
-    await loadFavourites();
+      const existing = favourites.find((p) => p.product_id === item.product_id);
+
+      if (existing) {
+        await removeFromFavourites(item.product_id);
+        setFavourites((prev) => prev.filter((p) => p.product_id !== item.product_id));
+      } else {
+        await addToFavourites(item);
+        setFavourites((prev) => [...prev, item]);
+      }
   };
+
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -161,3 +169,5 @@ export default function HomeScreen() {
     </View>
   );
 }
+
+

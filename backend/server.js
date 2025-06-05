@@ -8,6 +8,7 @@ const productRouter = require('./routers/ProductRouter');
 const categoryRouter = require('./routers/CategoryRouter');
 const OrderRouter = require('./routers/OrderRouter');
 const transactionRouter = require('./routers/TransactionRouter');
+const CartRouter = require('./routers/CartRouter');
 // const StripeRoute = require('./routers/StripeRoute');
 // const StripeWebhookHandler = require('./routers/StripeWebhookHandler');
 
@@ -24,7 +25,6 @@ app.use(express.json());
 
 
 // Thêm middleware CORS 
-const allowedOrigins = [ 'http://192.168.217.1:8081', 'http://192.168.1.29:8081', 'http://192.168.218.1:8081', ]; app.use(cors({ origin: function (origin, callback) { if (!origin || allowedOrigins.includes(origin)) { callback(null, true); } else { callback(new Error('Not allowed by CORS')); } }, credentials: true, }));
 
 // ✅ Route tạo session thanh toán
 // app.use('/api/stripe', StripeRoute);
@@ -47,6 +47,7 @@ app.use('/api/category', categoryRouter);
 app.use('/api/order', OrderRouter);
 app.use('/api/transaction', transactionRouter);
 app.use('/api/momo', momoRoutes);
+app.use('/api/cart', CartRouter);
 
 const PORT = process.env.PORT || 5000;
 

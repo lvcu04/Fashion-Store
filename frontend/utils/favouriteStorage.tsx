@@ -15,3 +15,15 @@ export const addToFavourites = async (item: any) => {
     console.error('Error adding to favourites:', e);
   }
 };
+export const removeFromFavourites = async (product_id: string) => {
+  try {
+    const existing = await AsyncStorage.getItem(STORAGE_KEY);
+    if (existing) {
+      const parsed = JSON.parse(existing);
+      const updated = parsed.filter((p: any) => p.product_id !== product_id);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    }
+  } catch (e) {
+    console.error('Error removing from favourites:', e);
+  }
+}

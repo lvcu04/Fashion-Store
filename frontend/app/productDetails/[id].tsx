@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useFavourites } from '@/context/favouriteContext';
 import { API } from '@/constants/api';
+import { useCart } from '@/context/cartContext';
+
 
 type Product = {
   product_id: string;
@@ -11,12 +13,14 @@ type Product = {
   image: string;
   title: string;
   price: number;
+  category_id?: string;
 };
 
 const ProductDetailScreen = () => {
-  const { id: productId } = useLocalSearchParams<{ id: string }>();
+  const { id: product_id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const [data, setData] = useState<any>(null);
+  const { addToCart, cart } = useCart();
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const { favourites, addFavourite, removeFavourite } = useFavourites();
@@ -26,7 +30,7 @@ const ProductDetailScreen = () => {
     if (isFavourite) {
       removeFavourite(product.product_id);
     } else {
-      addFavourite({ ...product, product_id: product.product_id });
+      addFavourite({ ...product, product_id: product.product_id, category_id: product.category_id ?? '' });
     }
   };
 
@@ -43,10 +47,10 @@ const ProductDetailScreen = () => {
   };
 
   useEffect(() => {
-    if (productId) {
-      fetchProductDetails(productId);
+    if (product_id) {
+      fetchProductDetails(product_id);
     }
-  }, [productId]);
+  }, [product_id]);
 
   if (loading) {
     return (
@@ -190,7 +194,19 @@ const ProductDetailScreen = () => {
 
       {/* Bottom Bar */}
       <View className="flex-row items-center px-4 py-4 border-t border-gray-200">
-        <TouchableOpacity className="flex-1 bg-black rounded-full py-4 mr-3">
+        <TouchableOpacity className="flex-1 bg-black rounded-full py-4 mr-3"
+        onPress={() => {
+         const item = {
+          product_id: product_id,
+          productName: data.productName,
+          image: data.image,
+          price: data.price,
+          quantity: quantity,
+        };
+
+        addToCart(item);
+        
+        }}>
           <Text className="text-white text-center font-semibold">
             Add to Cart
           </Text>

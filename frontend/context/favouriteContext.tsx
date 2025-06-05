@@ -1,45 +1,60 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+// context/favouContext.tsx
 
-export type Product = {
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+type Product = {
   product_id: string;
-  productName: string;
   image: string;
-  title: string;
+  productName: string;
   price: number;
-
+  category_id: string;
 };
 
-type FavouriteContextType = {
+type FavouritesContextType = {
   favourites: Product[];
   addFavourite: (product: Product) => void;
-  removeFavourite: (id: string) => void;
-  
+  removeFavourite: (productId: string) => void;
 };
 
-const FavouriteContext = createContext<FavouriteContextType | undefined>(undefined);
+const FavouritesContext = createContext<FavouritesContextType | undefined>(undefined);
 
-export const FavouriteProvider = ({ children }: { children: ReactNode }) => {
+export const FavouritesProvider = ({ children }: { children: ReactNode }) => {
   const [favourites, setFavourites] = useState<Product[]>([]);
 
+  // Load từ AsyncStorage khi app mở
+  useEffect(() => {
+    const loadFavourites = async () => {
+      const data = await AsyncStorage.getItem('favourites');
+      if (data) setFavourites(JSON.parse(data));
+    };
+    loadFavourites();
+  }, []);
+
+  // Lưu vào AsyncStorage mỗi khi thay đổi
+  useEffect(() => {
+    AsyncStorage.setItem('favourites', JSON.stringify(favourites));
+  }, [favourites]);
+
   const addFavourite = (product: Product) => {
-    setFavourites((prev) =>
-      prev.find((item) => item.product_id === product.product_id) ? prev : [...prev, product]
-    );
+    setFavourites((prev) => [...prev, product]);
   };
 
-  const removeFavourite = (product_id: string) => {
-    setFavourites((prev) => prev.filter((item) => item.product_id !== product_id));
+  const removeFavourite = (productId: string) => {
+    setFavourites((prev) => prev.filter((p) => p.product_id !== productId));
   };
 
   return (
-    <FavouriteContext.Provider value={{ favourites, addFavourite, removeFavourite }}>
+    <FavouritesContext.Provider value={{ favourites, addFavourite, removeFavourite }}>
       {children}
-    </FavouriteContext.Provider>
+    </FavouritesContext.Provider>
   );
 };
 
 export const useFavourites = () => {
-  const context = useContext(FavouriteContext);
-  if (!context) throw new Error('useFavourites must be used inside FavouriteProvider');
+  const context = useContext(FavouritesContext);
+  if (!context) {
+    throw new Error('useFavourites must be used within a FavouritesProvider');
+  }
   return context;
 };
