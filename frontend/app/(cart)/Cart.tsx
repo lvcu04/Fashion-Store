@@ -12,6 +12,7 @@ import {
 import { useRouter } from "expo-router";
 import { API } from "@/constants/api";
 import { useAuth } from "@/context/authContext";
+import { useCart } from "@/context/cartContext";//import để sử dụng cart đã xử lí bên cartContext
 
 
 type CartItem = {
@@ -24,76 +25,15 @@ type CartItem = {
 
 const MyCart = () => {
   const router = useRouter();
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [stockMap, setStockMap] = useState<Record<string, number>>({});
+  //gọi lại các hàm sẽ sử dụng ở cartContext
+  const { cartItems,fetchCartItems, removeCartItem, updateQuantityCartItem, totalPrice, stockMap, loadAllStocks } = useCart();
   const [loading, setLoading] = useState(false);
   const { firebaseUser } = useAuth();
-  // Gọi API lấy giỏ hàng
-  const fetchCartItems = async () => {
-    setLoading(true);
-    try {
-      const token = await firebaseUser?.getIdToken();
-      const res = await fetch(API.cart.getCartByUser,{
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await res.json();
-      console.log("Cart API Response:", data.items);
-      setCartItems(Array.isArray(data.items) ? data.items : []);
-    } catch (err) {
-      console.error("Error fetching cart:", err);
-      Alert.alert("Error", "Không tải được giỏ hàng");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchQuanlityProduct = async (productId: string): Promise<number> => {
-  try {
-    const token = await firebaseUser?.getIdToken();
-    const res = await fetch(API.product.getById(productId), {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    const data = await res.json();
-    return data.quantity || 0;
-  } catch (err) {
-    console.error("Lỗi khi lấy tồn kho:", err);
-    return 0;
-  }
-};
-
-
+//fetch lại cart mỗi khi quay lại trang
   useEffect(() => {
-    fetchCartItems();
+      fetchCartItems();
+      console.log("cartItems", cartItems);
   }, []);
-
-  // Cập nhật số lượng sản phẩm trong cart (local)
- const updateQuantity = (id: string, delta: number) => {
-  const stock = stockMap[id] ?? 0;
-  setCartItems((prev) =>
-    prev.map((item) => {
-      if (item.product_id !== id) return item;
-
-      const newQuantity = item.quantity + delta;
-      if (newQuantity < 1) return { ...item, quantity: 1 };
-      if (newQuantity > stock) {
-        Alert.alert("Error", "Quantity passed in stock.");
-        return item;
-      }
-      return { ...item, quantity: newQuantity };
-    })
-  );
-};
-
-
-  
 
   // Xử lý thanh toán (gửi toàn bộ giỏ lên backend 1 lần)
   // const handleToCheckout = async () => {
@@ -133,71 +73,11 @@ const MyCart = () => {
   //   }
   // };
 
-  // Xoá sản phẩm (gọi API)
-  const removeItem = async (product_id: string) => {
-  Alert.alert(
-    "Confirm deletion",
-    "Are you sure you want to delete the product?",
-    [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          console.log("Xoá sản phẩm:", product_id);
-          try {
-            setLoading(true);
-            const token = await firebaseUser?.getIdToken();
-            const res = await fetch(API.cart.removeFromCart(product_id), {
-              method: "DELETE",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            console.log("Xoá sản phẩm:", product_id, "Response:", res.status);
-            if (res.ok) {
-              fetchCartItems(); // Làm mới giỏ hàng
-            } else {
-              const errText = await res.text();
-              console.error("Xoá thất bại:", errText);
-              Alert.alert("Lỗi", "Không thể xoá sản phẩm.");
-            }
-          } catch (err) {
-            console.error("Lỗi xoá:", err);
-            Alert.alert("Lỗi", "Đã có lỗi khi xoá sản phẩm.");
-          } finally {
-            setLoading(false);
-          }
-        },
-      },
-    ]
-  );
-};
 
-
-   
-
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-
-// Load stock for all cart items when cartItems change
-useEffect(() => {
-  const loadAllStocks = async () => {
-    const missingStocks = cartItems.filter(
-      (item) => stockMap[item.product_id] === undefined
-    );
-    for (const item of missingStocks) {
-      const stock = await fetchQuanlityProduct(item.product_id);
-      setStockMap((prev) => ({ ...prev, [item.product_id]: stock }));
-    }
-  };
-  if (cartItems.length > 0) {
-    loadAllStocks();
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [cartItems]);
+  // Load stock for all cart items when cartItems change
+  useEffect(() => {
+      loadAllStocks(cartItems);
+    }, [cartItems]);
 
 const renderCartItem = ({ item }: { item: CartItem }) => {
   return (
@@ -222,14 +102,14 @@ const renderCartItem = ({ item }: { item: CartItem }) => {
 
         <View className="flex-row items-center mt-2">
           <TouchableOpacity
-            onPress={() => updateQuantity(item.product_id, -1)}
+            onPress={() => updateQuantityCartItem(item.product_id, -1)}
             className="bg-gray-200 rounded-full p-1"
           >
             <AntDesign name="minus" size={16} color="#374151" />
           </TouchableOpacity>
           <Text className="mx-3 text-lg text-gray-800">{item.quantity}</Text>
           <TouchableOpacity
-            onPress={() => updateQuantity(item.product_id, 1)}
+            onPress={() => updateQuantityCartItem(item.product_id, 1)}
             className="bg-gray-200 rounded-full p-1"
           >
             <AntDesign name="plus" size={16} color="#374151" />
@@ -237,7 +117,7 @@ const renderCartItem = ({ item }: { item: CartItem }) => {
         </View>
       </View>
 
-      <TouchableOpacity onPress={() => removeItem(item.product_id)} className="ml-2">
+      <TouchableOpacity onPress={() => removeCartItem(item.product_id)} className="ml-2">
         <AntDesign name="delete" size={20} color="#ef4444" />
       </TouchableOpacity>
     </View>
@@ -291,8 +171,11 @@ const renderCartItem = ({ item }: { item: CartItem }) => {
               </Text>
             </View>
             <TouchableOpacity
+              onPress={() => {
+                console.log("Cart hiện tại khi checkout:", cartItems); 
+                router.push('/(checkout)/checkout');
+              }}
               className="bg-gray-900 rounded-full py-4 flex-row items-center justify-center"
-              // onPress={handleToCheckout}
               disabled={loading}
             >
               <Text className="text-white font-semibold text-lg">
@@ -305,6 +188,7 @@ const renderCartItem = ({ item }: { item: CartItem }) => {
                 style={{ marginLeft: 8 }}
               />
             </TouchableOpacity>
+
           </View>
         </>
       )}
