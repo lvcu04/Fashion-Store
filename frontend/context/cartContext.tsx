@@ -47,6 +47,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);//khai báo thêm cart cục bộ
   const [stockMap, setStockMap] = useState<Record<string, number>>({});//khai báo stock product
 
+  
+  
   // Cập nhật sản phẩm trong giỏ hàng lên server
   const updateCart = async (item: CartItem) => {
     if (!firebaseUser) return;
@@ -85,6 +87,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         })) || [];
 
       setCart(updatedCart);
+    
     } catch (err) {
       console.error("❌ Lỗi khi cập nhật giỏ hàng:", err);
     }
@@ -92,7 +95,25 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   // Thêm hoặc cập nhật sản phẩm
   const addToCart = (item: CartItem) => {
-    updateCart(item);
+    const existingItem = cart.find((i) => i.product_id === item.product_id);
+
+  const updatedItem: CartItem = existingItem
+    ? { ...item, quantity: existingItem.quantity + item.quantity }
+    : item;
+
+  updateCart(updatedItem);
+
+  // Cập nhật local cartItems nếu cần thiết
+  setCartItems((prev) => {
+    const index = prev.findIndex((i) => i.product_id === item.product_id);
+    if (index !== -1) {
+      const updated = [...prev];
+      updated[index].quantity += item.quantity;
+      return updated;
+    } else {
+      return [...prev, item];
+    }
+  });
   };
 
   // Cập nhật số lượng hoặc xóa nếu quantity = 0
@@ -105,7 +126,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   //CART LOCAL
   // Gọi API lấy giỏ hàng local
-   const fetchCartItems = async () => {
+  const fetchCartItems = async () => {
   setLoading(true);
   try {
     const token = await firebaseUser?.getIdToken();

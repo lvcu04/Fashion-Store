@@ -25,6 +25,7 @@ const ProductDetailScreen = () => {
   const [quantity, setQuantity] = useState(1);
   const { favourites, addFavourite, removeFavourite } = useFavourites();
   const [selectedSize, setSelectedSize] = useState<string>('S');
+  const [cartBadgeCount, setCartBadgeCount] = useState(0);
   const toggleFavourite = (product: Product) => {
     const isFavourite = favourites.some(item => String(item.product_id) === String(product.product_id));
     if (isFavourite) {
@@ -203,18 +204,26 @@ const ProductDetailScreen = () => {
           price: data.price,
           quantity: quantity,
         };
-
+        console.log('Adding to cart:', item.quantity);
         addToCart(item);
-        
+        setCartBadgeCount(prev => prev + item.quantity);
         }}>
           <Text className="text-white text-center font-semibold">
             Add to Cart
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => router.push('/(cart)/Cart')}
-          className="w-14 h-14 items-center justify-center rounded-full bg-gray-100"
+          onPress={
+            () => {router.push('/(cart)/Cart');
+            setCartBadgeCount(0);
+          }}
+          className=" relative w-14 h-14 items-center justify-center rounded-full bg-gray-100"
         >
+              {cartBadgeCount > 0 && (
+                <View className="absolute -top-0 -right-0 bg-red-500 rounded-full px-1.5 py-0.5">
+                  <Text className="text-white text-xs font-bold">{cartBadgeCount}</Text>
+                </View>
+              )}
           <MaterialIcons name="shopping-cart" size={24} color="black" />
         </TouchableOpacity>
       </View>
