@@ -28,24 +28,46 @@ export const API = {
     edit: (category_id) => `${BASE_URL}/api/category/editCategory/${category_id}`,
     delete: (category_id) => `${BASE_URL}/api/category/deleteCategory/${category_id}`,
   },
-  order: {
-    all: `${BASE_URL}/api/order/allOrder`,
-    getById: (id) => `${BASE_URL}/api/order/${id}`,
-    add: `${BASE_URL}/api/order/addOrder`,
-    edit: (id) => `${BASE_URL}/api/order/editOrder/${id}`,
-    delete: (id) => `${BASE_URL}/api/order/deleteOrder/${id}`,
-  },
+    order: {
+      allOrders: `${BASE_URL}/api/order/getAllOrders`, // Admin
+      allOrdersUid: `${BASE_URL}/api/order/getAllOrdersUid`,
+      OrderByOrderId: (order_id) => `${BASE_URL}/api/order/getOrder/${order_id}`,
+      editOrderStatus: (order_id) => `${BASE_URL}/api/order/editOrderStatus/${order_id}`,
+      create: `${BASE_URL}/api/order/createOrder`,
+      cancel: (order_id) => `${BASE_URL}/api/order/cancel/${order_id}`,
+      orderSuccess: `${BASE_URL}/api/order/success`,
+      orderDelivey: `${BASE_URL}/api/order/delivery`,
+      orderCancel: `${BASE_URL}/api/order/cancel`,
+      orderPaid: `${BASE_URL}/api/order/paid`,
+    },
+
+    momo: {
+      create: `${BASE_URL}/api/momo/create`,        
+      ipn: `${BASE_URL}/api/momo/ipn`,              
+    },
+
   user: {
     role: `${BASE_URL}/api/user/role`,
     all: `${BASE_URL}/api/user/allUser`,
     getById: `${BASE_URL}/api/user/`,
+    //SHIPPING ADDRESS
+    getAddress: `${BASE_URL}/api/user/getAddress`,
+    createAddress: `${BASE_URL}/api/user/createAddress`,
+    updateAddress: `${BASE_URL}/api/user/updateAddress`,
+    removeAddress: `${BASE_URL}/api/user/removeAddress`,
+    //PAYMENT METHOD
+    getPaymentMethod: `${BASE_URL}/api/user/getPaymentMethod`,
+    getPaymentMethodSetTrue: `${BASE_URL}/api/user/getPaymentMethodSetTrue`,
+    addPaymentMethod: `${BASE_URL}/api/user/addPaymentMethod`,
+    updatePaymentMethod: `${BASE_URL}/api/user/updatePaymentMethod`,
   },
-  cart: {
+   cart: {
     getCartByUser: `${BASE_URL}/api/cart/`,
     update: `${BASE_URL}/api/cart/updateCart`,
     removeFromCart: (product_id) => `${BASE_URL}/api/cart/remove/${product_id}`,
     removeAll: `${BASE_URL}/api/cart/removeAll`,
     addToCart: `${BASE_URL}/api/cart/addCart`,
   },
+
 
 };

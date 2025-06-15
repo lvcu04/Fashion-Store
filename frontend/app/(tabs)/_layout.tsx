@@ -21,25 +21,17 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="myOrder"
+        name="Order"
         options={{
-          title: 'My Order',
+          title: 'Order',
           tabBarIcon: ({ color }) => <Ionicons name="cart" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="favourite"
+        name="notification"
         options={{
-          title: 'Favourite',
-          headerRight: () => (
-            <Ionicons
-              name="notifications-outline"
-              size={24}
-              color="#000"
-              style={{ marginRight: 15 }}
-            />
-          ),
-          tabBarIcon: ({ color }) => <Ionicons name="heart" size={24} color={color} />,
+          title: 'Notification',
+          tabBarIcon: ({ color }) => <Ionicons name="notifications" size={24} color={color} />,
         }}
       />
       <Tabs.Screen

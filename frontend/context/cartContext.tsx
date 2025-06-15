@@ -5,9 +5,9 @@ import React, {
   useState,
   ReactNode,
 } from "react";
+import { Alert } from "react-native";
 import { API } from "@/constants/api";
 import { useAuth } from "@/context/authContext";
-import { Alert } from "react-native";
 
 // Kiểu dữ liệu cho item trong giỏ hàng
 type CartItem = {
@@ -21,19 +21,16 @@ type CartItem = {
 // Kiểu dữ liệu context giỏ hàng
 type CartContextType = {
   cart: CartItem[];
-  cartItems: CartItem[];//khai báo thêm cart cục bộ
   addToCart: (item: CartItem) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  fetchCartItems: () => Promise<void>;//Từ hàm này đến các hàm dưới được chuyển từ cart.tsx qua
+  fetchCartItems: () => Promise<void>;
   fetchQuanlityProduct: (id: string) => Promise<number>;
-  updateQuantityCartItem: (id: string, delta: number) => void;
   loadAllStocks: (items: CartItem[]) => Promise<void>;
   removeCartItem: (id: string) => Promise<void>;
   totalPrice: number;
   stockMap: { [key: string]: number };
 };
-
 
 // Tạo context
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -41,40 +38,60 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 // Provider
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const { firebaseUser } = useAuth();
-  //CartItem
   const [loading, setLoading] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);//khai báo thêm cart cục bộ
-  const [stockMap, setStockMap] = useState<Record<string, number>>({});//khai báo stock product
+  const [stockMap, setStockMap] = useState<Record<string, number>>({});
+  const { firebaseUser } = useAuth();
 
+
+  // Cập nhật số lượng
+  const updateQuantity = async (product_id: string, quantity: number) => {
+    // 1. Cập nhật UI trước (ngay lập tức)
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item.product_id === product_id ? { ...item, quantity } : item
+      )
+    );
+
+    // 2. Đồng bộ server sau
+    if (!firebaseUser) return;
+    try {
+      const token = await firebaseUser.getIdToken();
+      const res = await fetch(API.cart.update, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          product_id,
+          quantity,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Cập nhật giỏ hàng thất bại");
+    } catch (err) {
+      console.error("❌ Lỗi khi cập nhật giỏ hàng:", err);
+      Alert.alert("Lỗi", "Không thể cập nhật sản phẩm.");
+    }
+  };
   
-  
-  // Cập nhật sản phẩm trong giỏ hàng lên server
-  const updateCart = async (item: CartItem) => {
+   // Thêm hoặc cập nhật sản phẩm
+  const addToCart = async (item: CartItem) => {
     if (!firebaseUser) return;
     try {
       const token = await firebaseUser.getIdToken();
       const res = await fetch(API.cart.addToCart, {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          items: [
-            {
-              product_id: item.product_id,
-              productName: item.productName,
-              image: item.image,
-              price: item.price,
-              quantity: item.quantity,
-            },
-          ],
+          items: [item],
         }),
-
       });
 
-      if (!res.ok) throw new Error("Cập nhật giỏ hàng thất bại");
+      if (!res.ok) throw new Error("Thêm vào giỏ thất bại");
 
       const data = await res.json();
       const updatedCart: CartItem[] =
@@ -87,151 +104,18 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         })) || [];
 
       setCart(updatedCart);
-    
     } catch (err) {
-      console.error("❌ Lỗi khi cập nhật giỏ hàng:", err);
+      console.error("❌ Lỗi khi thêm vào giỏ hàng:", err);
     }
   };
 
-  // Thêm hoặc cập nhật sản phẩm
-  const addToCart = (item: CartItem) => {
-    const existingItem = cart.find((i) => i.product_id === item.product_id);
 
-  const updatedItem: CartItem = existingItem
-    ? { ...item, quantity: existingItem.quantity + item.quantity }
-    : item;
-
-  updateCart(updatedItem);
-
-  // Cập nhật local cartItems nếu cần thiết
-  setCartItems((prev) => {
-    const index = prev.findIndex((i) => i.product_id === item.product_id);
-    if (index !== -1) {
-      const updated = [...prev];
-      updated[index].quantity += item.quantity;
-      return updated;
-    } else {
-      return [...prev, item];
-    }
-  });
-  };
-
-  // Cập nhật số lượng hoặc xóa nếu quantity = 0
-  const updateQuantity = (product_id: string, quantity: number) => {
-    const item = cart.find((i) => i.product_id === product_id);
-    if (item) {
-      updateCart({ ...item, quantity });
-    }
-  };
-
-  //CART LOCAL
-  // Gọi API lấy giỏ hàng local
-  const fetchCartItems = async () => {
-  setLoading(true);
-  try {
-    const token = await firebaseUser?.getIdToken();
-    const res = await fetch(API.cart.getCartByUser, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    const data = await res.json();
-    const serverItems = Array.isArray(data.items) ? data.items : [];
-
-    // Tạo bản sao cartItems hiện tại (local), ... để liệt kê sp có trong cartItems
-    const mergedItems = [...cartItems];
-
-    // Gộp serverItems vào mergedItems mà không làm mất local update
-    for (const serverItem of serverItems) {
-      const existingIndex = mergedItems.findIndex(//tìm vị trí sp trong local cart xem cố trùng product_id với sp trong cart server ko
-        (item) => item.product_id === serverItem.product_id
-      );
-
-      if (existingIndex !== -1) {
-        // Nếu sản phẩm đã có local, giữ lại local cart (không ghi đè server)
-        continue;
-      } else {
-        // Nếu là sản phẩm mới từ server, thêm vào cart cục bộ
-        mergedItems.push(serverItem);
-      }
-    }
-
-    setCartItems(mergedItems);
-  } catch (err) {
-    console.error("Error fetching cart:", err);
-    Alert.alert("Error", "Không tải được giỏ hàng");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-
-    
-    const fetchQuanlityProduct = async (productId: string): Promise<number> => {
-    try {
-      const token = await firebaseUser?.getIdToken();
-      const res = await fetch(API.product.getById(productId), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-  
-      const data = await res.json();
-      return data.quantity || 0;
-    } catch (err) {
-      console.error("Lỗi khi lấy tồn kho:", err);
-      return 0;
-    }
-  };
-   // Cập nhật số lượng sản phẩm trong cart (local)
- const updateQuantityCartItem = (id: string, delta: number) => {
-  const stock = stockMap[id] ?? 0;
-  setCartItems((prev) =>
-    prev.map((item) => {
-      if (item.product_id !== id) return item;
-
-      const newQuantity = item.quantity + delta;
-      if (newQuantity < 1) return { ...item, quantity: 1 };
-      if (newQuantity > stock) {
-        Alert.alert("Error", "Quantity passed in stock.");
-        return item;
-      }
-      return { ...item, quantity: newQuantity };
-    })
-  );
-  console.log("Cart items after update:", cartItems);
-  
-};
-const loadAllStocks = async (items: CartItem[]) => {
-  const missingStocks = items.filter(
-    (item) => stockMap[item.product_id] === undefined
-  );
-  for (const item of missingStocks) {
-    const stock = await fetchQuanlityProduct(item.product_id);
-    setStockMap((prev) => ({ ...prev, [item.product_id]: stock }));
-  }
-};
-
-//tạo hàm remove sp cart cục bộ riêng
-const removeCartItemLocal = (product_id: string) => {
-  setCartItems((prevItems) =>
-    prevItems.filter((item) => item.product_id !== product_id)
-  );
-};
-
-// Xoá sản phẩm (gọi API)
- const removeCartItem = async (product_id: string) => {
-  Alert.alert(
-    "Confirm deletion",
-    "Are you sure you want to delete the product?",
-    [
-      { text: "Cancel", style: "cancel" },
+  // Xoá sản phẩm khỏi giỏ
+  const removeCartItem = async (product_id: string) => {
+    Alert.alert("Xác nhận xoá", "Bạn có chắc muốn xoá sản phẩm này?", [
+      { text: "Huỷ", style: "cancel" },
       {
-        text: "Delete",
+        text: "Xoá",
         style: "destructive",
         onPress: async () => {
           try {
@@ -243,9 +127,8 @@ const removeCartItemLocal = (product_id: string) => {
                 Authorization: `Bearer ${token}`,
               },
             });
-            //nếu phản hồi từ server xóa ok, thì xóa lun khỏi cục bộ
             if (res.ok) {
-              removeCartItemLocal(product_id); // Xoá khỏi local UI
+              await fetchCartItems(); // Cập nhật lại sau khi xoá
             } else {
               const errText = await res.text();
               console.error("Xoá thất bại:", errText);
@@ -259,43 +142,95 @@ const removeCartItemLocal = (product_id: string) => {
           }
         },
       },
-    ]
-  );
+    ]);
+  };
+
+  // Lấy giỏ hàng từ server
+  const fetchCartItems = async () => {
+  setLoading(true);
+  try {
+    const token = await firebaseUser?.getIdToken();
+    const res = await fetch(API.cart.getCartByUser, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    const serverItems = Array.isArray(data.items) ? data.items : [];
+    const mapped = serverItems.map((i: any) => ({
+      product_id: i.product_id,
+      productName: i.productName,
+      image: i.image,
+      price: i.price,
+      quantity: i.quantity,
+    }));
+    setCart(mapped);
+  } catch (err) {
+    console.error("❌ Lỗi tải giỏ hàng:", err);
+    Alert.alert("Lỗi", "Không tải được giỏ hàng.");
+  } finally {
+    setLoading(false);
+  }
 };
 
 
-//hàm tính tổng
-const totalPrice = cartItems.reduce(
+  // Lấy tồn kho sản phẩm
+  const fetchQuanlityProduct = async (productId: string): Promise<number> => {
+    try {
+      const token = await firebaseUser?.getIdToken();
+      const res = await fetch(API.product.getById(productId), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      return data.quantity || 0;
+    } catch (err) {
+      console.error("❌ Lỗi lấy tồn kho:", err);
+      return 0;
+    }
+  };
+
+  // Load tồn kho cho nhiều sản phẩm
+  const loadAllStocks = async (items: CartItem[]) => {
+    const missing = items.filter((i) => stockMap[i.product_id] === undefined);
+    for (const item of missing) {
+      const stock = await fetchQuanlityProduct(item.product_id);
+      setStockMap((prev) => ({ ...prev, [item.product_id]: stock }));
+    }
+  };
+
+  // Tổng giá trị
+  const totalPrice = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  // Xóa sạch giỏ hàng ở frontend (chỉ frontend)
+  // Xoá toàn bộ cart (ở frontend)
   const clearCart = () => {
     setCart([]);
   };
 
-  // Khi đăng nhập → fetch lại giỏ hàng
+  // Khi đăng nhập thì reset giỏ hàng
   useEffect(() => {
-    setCart([]); // Reset giỏ hàng khi đăng nhập
-    setCartItems([]);
+    setCart([]);
   }, []);
 
   return (
     <CartContext.Provider
       value={{
         cart,
-        cartItems, //add thêm các hàm đã khai báo ở trên type nếu sử dụng
         addToCart,
         updateQuantity,
         clearCart,
         fetchCartItems,
         fetchQuanlityProduct,
-        updateQuantityCartItem,
         loadAllStocks,
         removeCartItem,
         totalPrice,
-        stockMap
+        stockMap,
       }}
     >
       {children}
@@ -303,9 +238,10 @@ const totalPrice = cartItems.reduce(
   );
 };
 
-// Custom hook
+// Hook dùng context
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) throw new Error("useCart must be used within a CartProvider");
+  if (!context)
+    throw new Error("useCart phải được sử dụng trong CartProvider");
   return context;
 };

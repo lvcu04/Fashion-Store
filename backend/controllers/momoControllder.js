@@ -1,8 +1,10 @@
-// controllers/momo.controller.js
+
 const crypto = require('crypto');
 const axios = require('axios');
 const Order = require('../models/Order');
-const Transaction = require('../models/Transaction');
+// const Transaction = require('../models/Transaction');
+const Cart = require('../models/Cart');
+const { Product } = require('../models/Product');
 
 const createPayment = async (req, res) => {
   const {
@@ -12,9 +14,9 @@ const createPayment = async (req, res) => {
     MOMO_API_URL,
     MOMO_REDIRECT_URL,
     MOMO_IPN_URL
-  } = process.env;
+  } = process.env;//khai báo các biến môi trường MOMO
 
-  const { uid, products, total_price, shipping_address } = req.body;
+  const { uid, total_price, shipping_address } = req.body;
   const orderId = MOMO_PARTNER_CODE + Date.now();
   const requestId = orderId;
   const orderInfo = 'Thanh toan don hang Momo';
@@ -24,17 +26,46 @@ const createPayment = async (req, res) => {
   const lang = 'vi';
 
   try {
-    // 1. Save Order with "pending" status
+    console.log("🛒 Đang kiểm tra giỏ hàng cho UID:", uid);
+
+    // 🔍 1. Lấy giỏ hàng trước khi tạo đơn hàng
+    const userCart = await Cart.findOne({ uid });
+
+    if (!userCart || !userCart.items || userCart.items.length === 0) {
+      console.log("❗ Giỏ hàng trống hoặc không tìm thấy");
+      return res.status(400).json({ error: 'Cart is empty or not found' });
+    }
+
+    const cartItems = userCart.items;
+    console.log("✅ Giỏ hàng:", cartItems);
+    
+      // 3. Trừ số lượng sản phẩm trong kho
+      for (const item of cartItems) {
+        const product = await Product.findOne({ product_id: item.product_id });
+        if (product) {
+          console.log(`🔄 Cập nhật tồn kho cho sản phẩm: ${item.product_id}`);
+          product.quantity -= item.quantity;
+          if (product.quantity < 0) product.quantity = 0;
+          await product.save();
+          console.log(`✅ Đã cập nhật tồn kho: còn ${product.quantity}`);
+        } else {
+          console.log(`❌ Không tìm thấy sản phẩm: ${item.product_id}`);
+        }
+      }
+
+    // 🧾 2. Tạo đơn hàng với trạng thái "pending", có cartItems
     await Order.create({
       order_id: orderId,
       uid,
       total_price,
       shipping_address,
       payment_method: 'MOMO',
-      order_status: 'pending'
+      order_status: 'pending',
+      cartItems // 🟢 Thêm giỏ hàng vào đơn
     });
+    console.log("✅ Đã tạo đơn hàng với trạng thái pending:", orderId);
 
-    // 2. Generate MoMo signature
+    // 🔐 3. Tạo chữ ký Momo
     const rawSignature = `accessKey=${MOMO_ACCESS_KEY}&amount=${total_price}&extraData=${extraData}&ipnUrl=${MOMO_IPN_URL}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${MOMO_PARTNER_CODE}&redirectUrl=${MOMO_REDIRECT_URL}&requestId=${requestId}&requestType=${requestType}`;
     const signature = crypto.createHmac('sha256', MOMO_SECRET_KEY).update(rawSignature).digest('hex');
 
@@ -63,54 +94,56 @@ const createPayment = async (req, res) => {
       data: requestBody
     });
 
+    console.log("✅ MoMo response:", momoResponse.data);
     res.status(200).json(momoResponse.data);
   } catch (error) {
-    console.error('Momo payment error:', error);
+    console.error('❌ Momo payment error:', error);
     res.status(500).json({ error: error.message || 'Lỗi thanh toán với Momo' });
   }
 };
 
-const handleIpn = async (req, res) => {
-  const {
-    orderId,
-    resultCode,
-    amount,
-    message,
-    transId
-  } = req.body;
+// const handleIpn = async (req, res) => {
+//   const {
+//     orderId,
+//     resultCode,
+//     amount,
+//     message,
+//     transId
+//   } = req.body;
 
-  try {
-    if (resultCode === 0) {
-      // 1. Update order to paid
-      await Order.findOneAndUpdate({ order_id: orderId }, { order_status: 'paid' });
+//   try {
+//     console.log("📩 IPN received:", req.body);
 
-      // 2. Create transaction for each product
-      const order = await Order.findOne({ order_id: orderId });
-      const { products } = req.body;
+//     if (resultCode === 0) {
+//       console.log("✅ Thanh toán thành công. Cập nhật đơn hàng:", orderId);
 
-      if (products && Array.isArray(products)) {
-        const transactions = products.map(p => ({
-          detail_order_id: transId,
-          product_id: p.product_id,
-          order_id: orderId,
-          product_name: p.product_name,
-          unit_price: p.unit_price,
-          order_quantity: p.quantity,
-          subtotal: p.unit_price * p.quantity
-        }));
-        await Transaction.insertMany(transactions);
-      }
-    } else {
-      await Order.findOneAndUpdate({ order_id: orderId }, { order_status: 'failed' });
-    }
+//       // 1. Cập nhật trạng thái đơn hàng
+//       await Order.findOneAndUpdate({ order_id: orderId }, { order_status: 'paid' });
 
-    res.status(200).json({ message: 'IPN received' });
-  } catch (err) {
-    res.status(500).json({ error: 'IPN handle failed', detail: err.message });
-  }
-};
+//       // 2. Lấy lại thông tin đơn hàng đã chứa cartItems
+//       const order = await Order.findOne({ order_id: orderId });
+//       const uid = order.uid;
+//       const cartItems = order.cartItems || [];
+
+//       if (!cartItems || cartItems.length === 0) {
+//         console.log("❗ Đơn hàng không chứa sản phẩm");
+//         return res.status(400).json({ error: 'Order does not contain cart items' });
+//       }
+
+//     } else {
+//       console.log(`❌ Thanh toán thất bại. Cập nhật trạng thái 'failed' cho đơn hàng: ${orderId}`);
+//       await Order.findOneAndUpdate({ order_id: orderId }, { order_status: 'failed' });
+//     }
+
+//     res.status(200).json({ message: 'IPN received' });
+//   } catch (err) {
+//     console.error('❌ IPN xử lý thất bại:', err.message);
+//     res.status(500).json({ error: 'IPN handle failed', detail: err.message });
+//   }
+// };
 
 module.exports = {
-  handleIpn,
+  // handleIpn,
   createPayment
 };
+

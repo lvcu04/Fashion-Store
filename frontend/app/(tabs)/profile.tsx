@@ -1,16 +1,19 @@
 import { useAuth } from '@/context/authContext';
-import { FontAwesome } from '@expo/vector-icons';
+import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useCheckout } from '@/context/checkoutContext';
 
 const Profile = () => {
   const { logout, firebaseUser } = useAuth();
   const router = useRouter();
+  const {resetCheckoutContext}= useCheckout();
 
   const handleLogout = async () => {
     try {
       await logout();
+      resetCheckoutContext(); // Reset checkout context on logout
       router.replace('/login');
     } catch (error) {
       console.error('Logout error:', error);
@@ -18,7 +21,7 @@ const Profile = () => {
   };
 
   type RouteType =
-    | '/(tabs)/myOrder'
+    | '/(tabs)/Order'
     | '/(tabs)/favourite'
     | '/(userProfile)/UserProfile'  
     | '/(cart)/Cart'
@@ -30,7 +33,7 @@ const Profile = () => {
     route?: RouteType;
   }[] = [
     { label: 'Personal Details', icon: 'user', route:'/(userProfile)/UserProfile' },
-    { label: 'My Order', icon: 'shopping-basket', route: '/(tabs)/myOrder' },
+    { label: 'My Order', icon: 'shopping-basket', route: '/(tabs)/Order' },
     { label: 'My Favourites', icon: 'heart', route: '/(tabs)/favourite' },
     { label: 'Shipping Address', icon: 'truck' },
     { label: 'My Card', icon: 'credit-card', route: '/(card)/Card' },
@@ -68,7 +71,7 @@ const Profile = () => {
             key={index}
             onPress={() => {
               if (item.route) {
-                router.push(item.route);
+                router.push(item.route as any);
               }
             }}
             className="flex-row justify-between items-center px-4 py-5 border-b border-gray-200"
@@ -89,7 +92,7 @@ const Profile = () => {
             key={index}
             onPress={() => {
               if (item.route) {
-                router.push(item.route);
+                router.push(item.route as any);
               }
             }}
             className="flex-row justify-between items-center px-4 py-5 border-b border-gray-200"
@@ -104,17 +107,16 @@ const Profile = () => {
       </View>
 
       {/* Logout button */}
-      <TouchableOpacity
+     <TouchableOpacity
         onPress={handleLogout}
-        style={{
-          backgroundColor: 'blue',
-          padding: 10,
-          borderRadius: 5,
-          marginTop: 20,
-        }}
+        className="mb-7 bg-red-500 px-4 py-3 rounded-2xl items-center justify-center"
       >
-        <Text className="text-white font-semibold text-base">Logout</Text>
+        <View className="flex-row items-center justify-center space-x-2">
+          <AntDesign name="logout" size={24} color="white" />
+          <Text className="text-white font-semibold text-xl ml-2">Logout</Text>
+        </View>
       </TouchableOpacity>
+
     </ScrollView>
   );
 };

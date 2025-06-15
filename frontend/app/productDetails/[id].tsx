@@ -2,7 +2,7 @@ import { MaterialIcons, Ionicons, AntDesign } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { useFavourites } from '@/context/favouriteContext';
+
 import { API } from '@/constants/api';
 import { useCart } from '@/context/cartContext';
 
@@ -20,21 +20,14 @@ const ProductDetailScreen = () => {
   const { id: product_id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const [data, setData] = useState<any>(null);
-  const { addToCart, cart } = useCart();
+  const { addToCart } = useCart();
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const { favourites, addFavourite, removeFavourite } = useFavourites();
+  
   const [selectedSize, setSelectedSize] = useState<string>('S');
   const [cartBadgeCount, setCartBadgeCount] = useState(0);
-  const toggleFavourite = (product: Product) => {
-    const isFavourite = favourites.some(item => String(item.product_id) === String(product.product_id));
-    if (isFavourite) {
-      removeFavourite(product.product_id);
-    } else {
-      addFavourite({ ...product, product_id: product.product_id, category_id: product.category_id ?? '' });
-    }
-  };
-
+  
+ 
   const fetchProductDetails = async (productId: string) => {
     try {
       const response = await fetch(API.product.getById(productId));
@@ -69,7 +62,7 @@ const ProductDetailScreen = () => {
     );
   }
 
-  const isFavourite = favourites.some(item => String(item.product_id) === String(data.id));
+
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
   return (
@@ -80,21 +73,8 @@ const ProductDetailScreen = () => {
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() =>
-            toggleFavourite({
-              product_id: data.id,
-              productName: data.productName,
-              image: data.image,
-              title: data.productName,
-              price: data.price,
-            })
-          }>
-            <MaterialIcons
-              name={isFavourite ? 'favorite' : 'favorite-border'}
-              size={25}
-              color={isFavourite ? 'red' : 'black'}
-            />
-          </TouchableOpacity>
+          
+          
         </View>
 
         {/* Product Image */}

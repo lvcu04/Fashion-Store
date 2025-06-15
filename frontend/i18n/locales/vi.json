@@ -1,0 +1,105 @@
+{
+  
+  "Welcome,": "Chào mừng,",
+  "Our Fashions App": "Ứng dụng thời trang của chúng tôi",
+  "Search for products...": "Tìm kiếm sản phẩm...",
+  "#Special for you": "#Ưu đãi đặc biệt cho bạn",
+  "Categories": "Danh mục",
+  "Top Products": "Sản phẩm nổi bật",
+ 
+   "categoryNames": {
+    "Shirts": "Áo ",
+    "Pants": "Quần",
+    "Shoes": "Giày dép",
+    "Watches": "Đồng hồ",
+    "Bags": "Túi xách",
+    "All": "Tất cả"
+  },
+  "User Profile": "Hồ sơ người dùng",
+  "Full Name": "Họ và tên",
+  "Personal Details": "Thông tin cá nhân",
+  "My Order": "Đơn hàng của tôi",
+  "My Favourites": "Yêu thích",
+  "Shipping Address": "Địa chỉ giao hàng",
+  "My Card": "Thẻ của tôi",
+  "Settings": "Cài đặt",
+  "My Cart": "Giỏ hàng",
+  "FAQs": "Câu hỏi thường gặp",
+  "Privacy Policy": "Chính sách bảo mật",
+  "Logout": "Đăng xuất",
+
+  "account": "Tài khoản",
+  "notifications": "Thông báo",
+  "privacy": "Quyền riêng tư",
+  "language": "Ngôn ngữ",
+  "help": "Trợ giúp",
+  "resetSettings": "Đặt lại cài đặt",
+
+  "userNameDefault": "Tên người dùng",
+  "emailDefault": "email@example.com",
+  "User Name": "Tên người dùng",
+
+  "View all": "Xem tất cả",
+  "Loading...": "Đang tải...",
+  "Add to cart": "Thêm vào giỏ",
+  "Buy now": "Mua ngay",
+  "Sold out": "Hết hàng",
+  "Product Details": "Chi tiết sản phẩm",
+  "Reviews": "Đánh giá",
+  "Related Products": "Sản phẩm liên quan",
+  "No products found": "Không tìm thấy sản phẩm",
+  "Back to Home": "Về trang chủ",
+  "Total": "Tổng cộng",
+  "Checkout": "Thanh toán",
+  "Your cart is empty": "Giỏ hàng của bạn đang trống",
+  "Continue shopping": "Tiếp tục mua sắm",
+  "Login": "Đăng nhập",
+  "Register": "Đăng ký",
+ 
+  "Profile": "Hồ sơ",
+  "Order History": "Lịch sử đơn hàng",
+
+   
+  "My Notifications":"Thông báo của tôi",
+  
+  "Language": "Ngôn ngữ",
+  "Notification": "Thông báo",
+  "Dark Mode": "Chế độ tối",
+  "Help Center": "Trung tâm trợ giúp",
+ 
+  "Order":"Đặt hàng",
+  "Success":"Thành công",
+  "Receiver": "Người nhận",
+
+
+  
+  "notification": {
+    "status": {
+      "paid": {
+        "title": "Đơn đang chờ thanh toán",
+        "label": "Paid"
+      },
+      "success": {
+        "title": "Đơn đã hoàn thành",
+        "label": "Success"
+      },
+      "delivered": {
+        "title": "Đơn đã được giao",
+        "label": "Delivered"
+      },
+      "canceled": {
+        "title": "Đơn đã bị hủy",
+        "label": "Canceled"
+      },
+      "unknown": {
+        "title": "Trạng thái không xác định",
+        "label": "Unknown"
+      }
+    },
+    "total": "Tổng",
+    "product": "{{count}} sản phẩm",
+    "empty": "Chưa có thông báo nào.",
+    "viewOrders": "Xem đơn hàng"
+  }
+}
+

@@ -46,6 +46,9 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  
+
+
   // Lấy role từ server
   const fetchRole = async (user: User) => {
     try {
@@ -111,6 +114,7 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
       setIsAuthenticated(true);
       await fetchRole(user);
       await fetchUserProfile(user);
+  
     } catch (error: any) {
       setIsAuthenticated(false);
       switch (error.code) {
@@ -150,6 +154,7 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
       setIsAuthenticated(true);
       await fetchRole(user);
       await fetchUserProfile(user);
+    
     } catch (error) {
       console.error("Registration error:", error);
       setIsAuthenticated(false);

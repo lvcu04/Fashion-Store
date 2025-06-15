@@ -45,6 +45,7 @@ const authMiddleware = {
       }
 
       req.user = user; // Gán user vào req để dùng tiếp
+      console.log("✅ UID từ token:", user.uid); 
       next();
     } catch (error) {
       console.error('Error verifying token:', error);
