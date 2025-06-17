@@ -8,7 +8,7 @@ const router = express.Router();
 // Route cụ thể trước
 router.get('/all', authMiddleware.AdminRight, userController.getAllUser);
 router.get('/role', authMiddleware.getRoleByToken, userController.getRole);
-
+router.post('/register',userController.register);
 // Route động sau cùng
 router.get('/',authMiddleware.VerifyToken, userController.getUser);
 //SHIPPING ADDRESS

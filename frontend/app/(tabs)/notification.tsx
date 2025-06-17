@@ -281,16 +281,8 @@ const Notification: React.FC = () => {
         ListEmptyComponent={
           <View className="items-center mt-10 px-4">
             <Text className="text-center text-gray-500">
-              {t('notification.empty') || 'No notifications found.'}
+              {t('No notifications found')}
             </Text>
-            <TouchableOpacity
-              className="mt-4 px-4 py-2 bg-blue-500 rounded"
-              onPress={() => router.push('/(tabs)/Order')}
-            >
-              <Text className="text-white">
-                {t('notification.viewOrders') || 'Xem đơn hàng'}
-              </Text>
-            </TouchableOpacity>
           </View>
         }
         contentContainerStyle={{ paddingBottom: 20 }}

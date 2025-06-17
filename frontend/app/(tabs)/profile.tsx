@@ -1,19 +1,21 @@
 import { useAuth } from '@/context/authContext';
-import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useCheckout } from '@/context/checkoutContext';
+import { useTranslation } from 'react-i18next';
 
 const Profile = () => {
   const { logout, firebaseUser } = useAuth();
   const router = useRouter();
-  const {resetCheckoutContext}= useCheckout();
+  const { resetCheckoutContext } = useCheckout();
+  const { t } = useTranslation(); 
 
   const handleLogout = async () => {
     try {
       await logout();
-      resetCheckoutContext(); // Reset checkout context on logout
+      resetCheckoutContext();
       router.replace('/login');
     } catch (error) {
       console.error('Logout error:', error);
@@ -23,22 +25,23 @@ const Profile = () => {
   type RouteType =
     | '/(tabs)/Order'
     | '/(tabs)/favourite'
-    | '/(userProfile)/UserProfile'  
+    | '/(userProfile)/UserProfile'
     | '/(cart)/Cart'
-    | '/(card)/Card';
+    | '/(card)/Card'
+    | '/(settings)/settingItem'
+    | string; 
 
   const profileOptions: {
     label: string;
     icon: string;
     route?: RouteType;
   }[] = [
-    { label: 'Personal Details', icon: 'user', route:'/(userProfile)/UserProfile' },
-    { label: 'My Order', icon: 'shopping-basket', route: '/(tabs)/Order' },
-    { label: 'My Favourites', icon: 'heart', route: '/(tabs)/favourite' },
-    { label: 'Shipping Address', icon: 'truck' },
-    { label: 'My Card', icon: 'credit-card', route: '/(card)/Card' },
-    { label: 'Settings', icon: 'cogs' },
-    { label: 'My Cart', icon: 'shopping-cart', route: '/(cart)/Cart' },
+    { label: t('Personal Details'), icon: 'user', route: '/(userProfile)/UserProfile' },
+    { label: t('My Order'), icon: 'shopping-basket', route: '/(tabs)/Order' },
+    { label: t('Shipping Address'), icon: 'truck',route:'/(checkout)/checkoutAddress' },
+    { label: t('My Card'), icon: 'credit-card', route: '/(card)/Card' },
+    { label: t('Settings'), icon: 'cogs', route: '/(settings)/settingItem' },
+    { label: t('My Cart'), icon: 'shopping-cart', route: '/(cart)/Cart' },
   ];
 
   const policyOptions: {
@@ -46,8 +49,8 @@ const Profile = () => {
     icon: string;
     route?: RouteType;
   }[] = [
-    { label: 'FAQs', icon: 'question-circle' },
-    { label: 'Privacy Policy', icon: 'shield' },
+    { label: t('FAQs'), icon: 'question-circle' },
+    { label: t('Privacy Policy'), icon: 'shield' },
   ];
 
   return (
@@ -59,7 +62,7 @@ const Profile = () => {
           className="w-20 h-20 rounded-full mb-2"
         />
         <Text className="text-lg font-semibold">
-          {firebaseUser?.displayName || 'User Name'}
+          {firebaseUser?.displayName || t('User Name')}
         </Text>
         <Text className="text-gray-500">{firebaseUser?.email || 'email@example.com'}</Text>
       </View>
@@ -69,11 +72,7 @@ const Profile = () => {
         {profileOptions.map((item, index) => (
           <TouchableOpacity
             key={index}
-            onPress={() => {
-              if (item.route) {
-                router.push(item.route as any);
-              }
-            }}
+            onPress={() => item.route && router.push(item.route as any)}
             className="flex-row justify-between items-center px-4 py-5 border-b border-gray-200"
           >
             <View className="flex-row items-center">
@@ -90,11 +89,7 @@ const Profile = () => {
         {policyOptions.map((item, index) => (
           <TouchableOpacity
             key={index}
-            onPress={() => {
-              if (item.route) {
-                router.push(item.route as any);
-              }
-            }}
+            onPress={() => item.route && router.push(item.route as any)}
             className="flex-row justify-between items-center px-4 py-5 border-b border-gray-200"
           >
             <View className="flex-row items-center">
@@ -107,16 +102,17 @@ const Profile = () => {
       </View>
 
       {/* Logout button */}
-     <TouchableOpacity
+      <TouchableOpacity
         onPress={handleLogout}
         className="mb-7 bg-red-500 px-4 py-3 rounded-2xl items-center justify-center"
       >
         <View className="flex-row items-center justify-center space-x-2">
           <AntDesign name="logout" size={24} color="white" />
-          <Text className="text-white font-semibold text-xl ml-2">Logout</Text>
+          <Text className="text-white font-semibold text-xl ml-2">
+            {t('Logout')}
+          </Text>
         </View>
       </TouchableOpacity>
-
     </ScrollView>
   );
 };

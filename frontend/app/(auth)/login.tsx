@@ -167,7 +167,7 @@ const LoginScreen = () => {
           </View>
 
           <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-            <Text className="text-blue-600 text-center font-medium">
+            <Text className="text-blue-600 mb-8 text-center font-medium">
               Don’t have an account? Sign up
             </Text>
           </TouchableOpacity>

@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authContext';
 import { API } from '@/constants/api';
+import { Ionicons } from '@expo/vector-icons';
 
 const AddAddressScreen = () => {
   const router = useRouter();
@@ -54,8 +55,9 @@ const AddAddressScreen = () => {
   return (
     <View className="flex-1 bg-white px-4 pt-6">
       {/* Header */}
-      <View className="mb-6">
+      <View className="mb-6 flex flex-row justify-between">
         <Text className="text-xl font-bold">Add New Address</Text>
+        <TouchableOpacity onPress={() => router.push('/(checkout)/checkout')}><Ionicons name='arrow-back' size={24}/></TouchableOpacity>
       </View>
 
       {/* Form fields */}

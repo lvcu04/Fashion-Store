@@ -3,7 +3,6 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
-  createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   updateProfile,
   updateEmail,
@@ -26,7 +25,7 @@ interface AuthContextType {
   role: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (payload: RegisterPayload) => Promise<void>;
   handleGoogleLogin: () => Promise<User | null>;
   handleFacebookLogin: () => Promise<User | null>;
   resetPassword: (email: string) => Promise<void>;
@@ -34,6 +33,24 @@ interface AuthContextType {
   updateUserEmail: (newEmail: string) => Promise<void>;
   updateUserPassword: (newPassword: string) => Promise<void>;
 }
+
+
+interface RegisterPayload {
+  email: string;
+  password: string;
+  name: string;
+  phone: string;
+  address?: {
+    street?: string;
+    city?: string;
+    receiverName?: string;
+  };
+  paymentMethod?: {
+    type: string;
+    isDefault: boolean;
+  }[];
+}
+
 
 // Tạo context
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -147,19 +164,22 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   // Đăng ký
-  const register = async (email: string, password: string) => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      setIsAuthenticated(true);
-      await fetchRole(user);
-      await fetchUserProfile(user);
-    
-    } catch (error) {
-      console.error("Registration error:", error);
-      setIsAuthenticated(false);
-    }
-  };
+  const register = async (payload: RegisterPayload) => {
+    const response = await fetch(`${API.user.register}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Đăng ký thất bại');
+      }
+
+    };
+
 
   // Đăng nhập bằng Google
  const handleGoogleLogin = async (): Promise<User | null> => {

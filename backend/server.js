@@ -7,7 +7,6 @@ const UserRouter = require('./routers/UserRouter');
 const productRouter = require('./routers/ProductRouter');
 const categoryRouter = require('./routers/CategoryRouter');
 const OrderRouter = require('./routers/OrderRouter');
-const transactionRouter = require('./routers/TransactionRouter');
 const CartRouter = require('./routers/CartRouter');
 // const StripeRoute = require('./routers/StripeRoute');
 // const StripeWebhookHandler = require('./routers/StripeWebhookHandler');
@@ -45,7 +44,7 @@ app.use('/api/user', UserRouter);
 app.use('/api/product', productRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/order', OrderRouter);
-app.use('/api/transaction', transactionRouter);
+
 app.use('/api/momo', momoRoutes);
 app.use('/api/cart', CartRouter);
 

@@ -196,6 +196,7 @@ const fetchDefaultPaymentMethod = async () => {
     const defaultMethod = data.defaultPaymentMethod;
 
     setSelectedPaymentMethod(defaultMethod?.type || null);
+ 
   } catch (err) {
     console.error("❌ Lỗi lấy phương thức mặc định:", err);
     Alert.alert("Lỗi", "Không thể lấy phương thức thanh toán mặc định.");

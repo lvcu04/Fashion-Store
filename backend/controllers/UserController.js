@@ -4,40 +4,63 @@ const admin = require('../firebase/firebaseAdmin.js');// Firebase Admin SDK đã
 
 const userController = {
   register: async (req, res) => {
-    const { email , password, name, phone, address } = req.body;
+  const { email, password, name, phone, address , paymentMethod } = req.body;
 
-    if (!email || !password || !name) {
-      return res.status(400).json({ message: "Email, password, and name are required." });
+  if (!email || !password || !name) {
+    return res.status(400).json({ message: 'Email, password và name là bắt buộc.' });
+  }
+
+  try {
+    // Kiểm tra email đã tồn tại trên Firebase
+    try {
+      await admin.auth().getUserByEmail(email);
+      return res.status(409).json({ message: 'Email đã tồn tại!' });
+    } catch (error) {
+      if (error.code !== 'auth/user-not-found') {
+        return res.status(500).json({ message: 'Lỗi khi kiểm tra email.' });
+      }
     }
 
-    try {
-      //Tạo tài khoản người dùng trong firebase
-      const userRecord = await admin.auth().createUser({
-        email,
-        password,
-        displayName: name,
-        phoneNumber: phone,
-      });
-      //Tạo tài khoản người dùng trong MongoDB
-      const newUser = new User({
-        uid:userRecord.uid,
-        email:userRecord.email,
-        name:userRecord.displayName,
-        phone:userRecord.phoneNumber,
-        address: [{
+    // Tạo tài khoản Firebase
+    const userRecord = await admin.auth().createUser({
+      email,
+      password,
+    });
+
+    // Xử lý address (có thể không có)
+      const addressList = [];
+      if (address?.street && address?.city) {
+        addressList.push({
           street: address.street,
           city: address.city,
-          zipcode: address.zipcode,
-        },]
-    });
-      await newUser.save();
-      res.status(201).json({ message: 'User registered successfully', user: newUser });
+          receiverName: address.receiverName || '',
+        });
+      }
+
+      // Lưu MongoDB
+      const newUser = new User({
+        uid: userRecord.uid,
+        email: userRecord.email,
+        name,
+        phone,
+        address: addressList,
+        paymentMethod: paymentMethod || [],
+      });
+
+    await newUser.save();
+    return res.status(201).json({ message: 'Đăng ký thành công', user: newUser });
+
+  } catch (error) {
+    console.error('Error registering user:', error);
+    if (error.code === 11000) {
+      const duplicatedField = Object.keys(error.keyPattern)[0];
+      return res.status(409).json({ message: `${duplicatedField} đã tồn tại trong hệ thống.` });
     }
-    catch (error) {
-      console.error('Error registering user:', error);
-      res.status(500).json({ message: 'Error registering user', error });
-    }
-  },
+    return res.status(500).json({ message: 'Đăng ký thất bại', error });
+  }
+},
+
+
    // Login nên được xử lý phía client (Firebase Client SDK) 
   // login không cần sử lý ở đây 
    getAllUser: async (req, res) => {

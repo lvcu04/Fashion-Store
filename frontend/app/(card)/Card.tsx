@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { API } from '@/constants/api';
 import { useAuth } from '@/context/authContext';
 import { useRouter } from 'expo-router';
@@ -34,8 +34,10 @@ const MyCard = () => {
 
   return (
     <View className="flex-1 bg-white">
-      <Text className="text-xl font-bold px-4 py-6">My Payment Methods</Text>
-
+      <View className="mb-6 flex flex-row justify-between">
+         <Text className="text-xl ml-2 font-bold">My Payment Methods</Text>
+         <TouchableOpacity className="mr-2" onPress={() => router.push('/(checkout)/checkout')}><Ionicons name='arrow-back' size={24}/></TouchableOpacity>
+      </View>
       {Array.isArray(methods) &&
       methods.map((method) => (
         <TouchableOpacity

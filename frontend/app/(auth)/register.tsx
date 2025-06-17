@@ -1,10 +1,29 @@
+import { useAuth } from '@/context/authContext';
 import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
+interface RegisterPayload {
+  email: string;
+  password: string;
+  name: string;
+  phone: string;
+  address?: {
+    street?: string;
+    city?: string;
+    receiverName?: string;
+  };
+  paymentMethod?: {
+    type: string;
+    isDefault: boolean;
+  }[];
+}
+
+
 const RegisterScreen = () => {
   const [username, setUsername] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -12,18 +31,73 @@ const RegisterScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const { register } = useAuth();
   const router = useRouter();
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!agreeTerms) {
       alert('You must agree to the terms and conditions.');
       return;
     }
 
-    // TODO: Registration logic
-    alert('Registered successfully!');
-    router.replace('/(tabs)/home');
+    if (!username || !email || !password || !confirmPassword || !phone) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      alert('Passwords do not match.');
+      return;
+    }
+
+    if (password.length < 6) {
+      alert('Mật khẩu phải có ít nhất 6 ký tự.');
+      return;
+    }
+
+    const formatPhone = (phone: string) => {
+      const cleaned = phone.replace(/\D/g, '');
+      if (cleaned.startsWith('0')) return '+84' + cleaned.slice(1);
+      if (cleaned.startsWith('84')) return '+' + cleaned;
+      if (cleaned.startsWith('+')) return cleaned;
+      return '+84' + cleaned;
+    };
+
+    const formattedPhone = formatPhone(phone);
+
+    if (!formattedPhone?.match(/^\+?[1-9]\d{7,14}$/)) {
+      alert('Số điện thoại không hợp lệ (ví dụ: +84901234567)');
+      return;
+    }
+   try {
+      const formattedPhone = formatPhone(phone);
+
+      const payload: RegisterPayload = {
+        email,
+        password,
+        name: username,
+        phone: formattedPhone,
+        paymentMethod: [
+          { type: 'COD', isDefault: true },
+          { type: 'MOMO', isDefault: false }
+        ],
+     
+        address: {
+          street: '',
+          city: '',
+          receiverName: ''
+        }
+      };
+
+      await register(payload);
+      alert('Đăng ký thành công. Vui lòng đăng nhập lại.');
+      router.replace('/(auth)/login');
+    } catch (error: any) {
+      alert('Đăng ký thất bại: ' + error.message);
+    }
   };
+
+
 
   return (
     <ScrollView className="flex-1 bg-white px-6">
@@ -61,6 +135,14 @@ const RegisterScreen = () => {
 
       <TextInput
         className="w-full bg-gray-100 p-4 rounded-xl mb-4 border border-gray-300"
+        placeholder="User Phone"
+        value={phone}
+        onChangeText={setPhone}
+      />
+
+
+      <TextInput
+        className="w-full bg-gray-100 p-4 rounded-xl mb-4 border border-gray-300"
         placeholder="Email"
         keyboardType="email-address"
         value={email}
@@ -81,7 +163,7 @@ const RegisterScreen = () => {
           onPress={() => setShowPassword(!showPassword)}
         >
           <FontAwesome
-            name={showPassword ? 'eye-slash' : 'eye'}
+            name={showPassword ? 'eye' : 'eye-slash'}
             size={20}
             color="gray"
           />
@@ -113,19 +195,18 @@ const RegisterScreen = () => {
         className="flex-row items-center mb-6"
         onPress={() => setAgreeTerms(!agreeTerms)}
       >
-        <View className="w-5 h-5 border border-gray-400 rounded-sm mr-3 items-center justify-center bg-white">
-          {agreeTerms && <FontAwesome name="check" size={14} color="black" />}
+        <View className="w-5 h-5 border border-gray-400 rounded-sm mr-2 items-center justify-center bg-white">
+          {agreeTerms && <FontAwesome name="check" size={12} color="black" />}
         </View>
-        <Text className="text-gray-500 text-sm">
-          By creating an account you have to agree with our them & condition.
+        <Text className="text-gray-500 text-base">
+          By creating an account you have to agree with our terms & conditions.
         </Text>
       </TouchableOpacity>
-
       <TouchableOpacity
         className="bg-black p-4 rounded-full items-center mb-10"
         onPress={handleRegister}
       >
-        <Text className="text-white font-semibold">Login</Text>
+        <Text className="text-white font-semibold">Register</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -133,8 +214,3 @@ const RegisterScreen = () => {
 
 export default RegisterScreen;
 
-// import RegisterScreen from '@/screens/registerScreen'
-
-// export default function Register() {
-//   return <RegisterScreen/>
-// }
