@@ -15,7 +15,7 @@ export default function SettingsScreen() {
 
   return (
     <View className="flex-1 bg-white p-5">
-      <View className='flex flex-row items-center justify-start mb-4'>
+      <View className='flex flex-row items-center justify-start mb-4 mt-5'>
         <Ionicons name="arrow-back" size={24} color="black" onPress={() => route.push("/(tabs)/profile")} />
         <Text className="text-xl font-bold ml-3">{t('Settings')}</Text>
       </View>

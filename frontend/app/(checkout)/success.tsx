@@ -9,7 +9,7 @@ const SuccessScreen = () => {
 //   const navigation = useNavigation();
 
   return (
-    <View className="flex-1 bg-yellow-400 items-center justify-center px-5">
+    <View className="flex-1 bg-yellow-400 items-center  justify-center px-5">
       {/* Confetti Effect */}
       <ConfettiCannon
         count={200}

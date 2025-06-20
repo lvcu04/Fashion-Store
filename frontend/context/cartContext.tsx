@@ -112,10 +112,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   // Xoá sản phẩm khỏi giỏ
   const removeCartItem = async (product_id: string) => {
-    Alert.alert("Xác nhận xoá", "Bạn có chắc muốn xoá sản phẩm này?", [
-      { text: "Huỷ", style: "cancel" },
+    Alert.alert("Comfirm deletion", "Are you sure you want to delete this product?", [
+      { text: "Cancel", style: "cancel" },
       {
-        text: "Xoá",
+        text: "Delete",
         style: "destructive",
         onPress: async () => {
           try {

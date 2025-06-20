@@ -143,7 +143,7 @@ const Checkout = () => {
   return (
     <ScrollView className="flex-1 bg-white p-5">
       {/* Header */}
-      <View className="flex-row items-center mb-4">
+      <View className="flex-row items-center pt-12 pb-4 ">
         <TouchableOpacity onPress={() => router.push('/(cart)/Cart')}>
           <AntDesign name="arrowleft" size={24} color="#000" />
         </TouchableOpacity>

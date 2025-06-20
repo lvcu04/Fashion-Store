@@ -167,10 +167,7 @@ const MyOrder = () => {
 
   return (
     <View className="flex-1 bg-gray-50">
-      <View className="bg-white pt-12 pb-4 px-5 flex-row items-center">
-        <TouchableOpacity onPress={() => router.push('/profile')}>
-          <AntDesign name="arrowleft" size={24} color="#000000" />
-        </TouchableOpacity>
+      <View className="bg-white pt-12 pb-4 px-5 ">
         <Text className="text-3xl font-bold text-black ml-4">My Orders</Text>
       </View>
       <View className="bg-white px-5 pb-5">

@@ -147,10 +147,10 @@ export default function HomeScreen() {
       <View className="flex-row justify-between items-center mb-2">
         <Text className="font-bold text-lg">
           {selectedCategoryId === '' || selectedCategoryId === null
-            ? t('Top Products')
-            : 'Top ' + t(`categoryNames.${selectedCategory?.categoryName}`)}
+            ? t('Products')
+            :  t(`categoryNames.${selectedCategory?.categoryName}`)}
         </Text>
-        <Text className="text-gray-500 text-sm">{t('View all')}</Text>
+        
       </View>
 
       {/* Product List */}

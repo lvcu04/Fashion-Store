@@ -39,7 +39,6 @@ const Profile = () => {
     { label: t('Personal Details'), icon: 'user', route: '/(userProfile)/UserProfile' },
     { label: t('My Order'), icon: 'shopping-basket', route: '/(tabs)/Order' },
     { label: t('Shipping Address'), icon: 'truck',route:'/(checkout)/checkoutAddress' },
-    { label: t('My Card'), icon: 'credit-card', route: '/(card)/Card' },
     { label: t('Settings'), icon: 'cogs', route: '/(settings)/settingItem' },
     { label: t('My Cart'), icon: 'shopping-cart', route: '/(cart)/Cart' },
   ];

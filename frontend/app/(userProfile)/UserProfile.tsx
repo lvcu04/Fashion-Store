@@ -7,24 +7,29 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
-  
+  Alert,
+  Modal,
+  TouchableWithoutFeedback,
+  TextInput,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 
 import { useAuth } from "@/context/authContext";
 import { useTranslation } from 'react-i18next';
+import { API } from "@/constants/api";
 
-const GENDERS = ["Male", "Female"];
+
 
 const UserProfile = () => {
   const router = useRouter();
-  const { userProfile } = useAuth();
+  const { userProfile , firebaseUser } = useAuth();
   const { t } = useTranslation();
   const [darkMode, setDarkMode] = React.useState(false);
   const [notifications, setNotifications] = React.useState(true);
   const [selectedLanguage, setSelectedLanguage] = React.useState("English");
-  const [gender, setGender] = React.useState("Male");
+  const [showChangePass, setShowChangePass] = React.useState(false);
+  const [newPassword, setNewPassword] = React.useState('');
   const [isLanguageModalVisible, setLanguageModalVisible] = React.useState(false);
 
   const renderLanguageItem = ({ item }: { item: string }) => (
@@ -39,12 +44,47 @@ const UserProfile = () => {
     </TouchableOpacity>
   );
 
-  return (
+  const maskHalf = (value : string) => {
+    if (!value) return '';
+    const length = value.length;
+    const visibleLength = Math.floor(length / 2);
+    const hidden = '*'.repeat(length - visibleLength);
+    return value.slice(0,visibleLength) + hidden;
+  }
 
+  const handleChangePassword = async () => {
+      try {
+        const token = await firebaseUser?.getIdToken();
+
+        const res = await fetch(API.user.changePass, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ newPassword }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.message || 'Đổi mật khẩu thất bại');
+
+        Alert.alert('Thành công', 'Đã đổi mật khẩu');
+        setShowChangePass(false);
+        setNewPassword('');
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        Alert.alert('Lỗi', message);
+      }
+    };
+
+
+  return (
+   <>
     <ScrollView className="flex-1 bg-gray-50">
       <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
       <View className="bg-white pt-12 pb-4 px-5 flex-row items-center">
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => router.push('/(tabs)/profile')}>
           <AntDesign name="arrowleft" size={24} color="#000000" />
         </TouchableOpacity>
         <Text className="text-3xl font-bold text-black ml-4">{t('User Profile')}</Text>
@@ -69,38 +109,78 @@ const UserProfile = () => {
         </View>
 
         {/* Info Boxes */}
-        <View className="space-y-4">
-          <View className="bg-white rounded-2xl p-3 shadow-md border border-gray-200">
+        <View className="space-y-4 ">
+          <View className="bg-white rounded-2xl p-3 shadow-md border border-gray-50 mb-3">
             <Text className="text-sm text-gray-600">{t('Full Name')}</Text>
             <Text className="text-xl font-bold text-gray-900">{userProfile.name || "..."}</Text>
           </View>
 
-          {/* Gender Switcher */}
-          <View className="bg-white rounded-2xl p-3 shadow-md border border-gray-200">
-            <Text className="text-sm text-gray-600 mb-2">Gender</Text>
+          
+          <View className="bg-white rounded-2xl p-3 shadow-md border border-gray-50 mb-3">
+            <Text className="text-sm text-gray-600 mb-2">Email</Text>
             <View className="flex-row space-x-3">
-              {GENDERS.map((g) => (
-                <TouchableOpacity
-                  key={g}
-                  onPress={() => setGender(g)}
-                  className={`flex-1 px-3 py-2 rounded-lg border ${
-                    gender === g ? "bg-indigo-100 border-indigo-400" : "bg-gray-100 border-gray-300"
-                  }`}
-                >
-                  <Text className="text-center text-gray-700 font-medium">{g}</Text>
-                </TouchableOpacity>
-              ))}
+              <TouchableOpacity>
+                <Text>
+                 {maskHalf(userProfile.email)}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
-
-         
+          <View className="bg-white rounded-2xl p-3 shadow-md border border-gray-50 mb-3">
+            <Text className="text-sm text-gray-600 mb-2">Phone</Text>
+            <View className="flex-row space-x-3">
+              <TouchableOpacity>
+                <Text>
+                 {maskHalf(userProfile.phone)}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View className="bg-white rounded-2xl p-3 shadow-md border border-gray-50 mb-3">
+            <View className="flex-row space-x-3">
+              <TouchableOpacity onPress={() => setShowChangePass(true)}>
+                <Text className="text-blue-500 font-medium">Change Password</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </View>
 
       {/* Language Modal */}
       
     </ScrollView>
-
+    {showChangePass && (
+      <Modal
+        visible={showChangePass}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowChangePass(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setShowChangePass(false)}>
+          <View className="flex-1 justify-center items-center bg-black/40">
+            <TouchableWithoutFeedback>
+              <View className="bg-white w-[90%] rounded-2xl p-5">
+                <Text className="text-lg font-bold mb-3">Change Password</Text>
+                <TextInput
+                  placeholder="New Password"
+                  secureTextEntry
+                  className="border border-gray-300 rounded-lg px-3 py-2 mb-4"
+                  value={newPassword}
+                  onChangeText={setNewPassword}
+                />
+                <TouchableOpacity
+                  className="bg-blue-500 py-2 rounded-lg"
+                  onPress={handleChangePassword}
+                >
+                  <Text className="text-white text-center">Confirm</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+    )}
+    </>
   );
 };
 

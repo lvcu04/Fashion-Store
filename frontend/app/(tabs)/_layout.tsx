@@ -2,15 +2,15 @@ import { Tabs, Redirect } from 'expo-router';
 import { useAuth } from '@/context/authContext';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function TabsLayout() {
-  const { isAuthenticated ,role } = useAuth();
 
-  console.log(role);
+export default function TabsLayout() {
+  const { isAuthenticated, role } = useAuth();
+
+
   if (isAuthenticated === undefined) return null;
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
-
   if (role === 'admin') return <Redirect href="/(admin)" />;
-  
+
   return (
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
@@ -32,6 +32,7 @@ export default function TabsLayout() {
         options={{
           title: 'Notification',
           tabBarIcon: ({ color }) => <Ionicons name="notifications" size={24} color={color} />,
+          
         }}
       />
       <Tabs.Screen

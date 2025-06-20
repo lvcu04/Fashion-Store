@@ -34,8 +34,8 @@ const MyCard = () => {
 
   return (
     <View className="flex-1 bg-white">
-      <View className="mb-6 flex flex-row justify-between">
-         <Text className="text-xl ml-2 font-bold">My Payment Methods</Text>
+      <View className="mb-6 flex flex-row justify-between mt-6">
+         <Text className="text-xl ml-2 font-bold ">My Payment Methods</Text>
          <TouchableOpacity className="mr-2" onPress={() => router.push('/(checkout)/checkout')}><Ionicons name='arrow-back' size={24}/></TouchableOpacity>
       </View>
       {Array.isArray(methods) &&

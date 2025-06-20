@@ -30,7 +30,7 @@ const SelectAddressScreen = () => {
   const renderAddress = ({ item }: { item: Address }) => (
     <TouchableOpacity
       onPress={() => handleSelectAddress(item)}
-      className={`bg-white p-4 rounded-2xl mb-4 shadow flex-col ${
+      className={`bg-gray-50 p-4 rounded-2xl mb-4 shadow flex-col ${
         selectedId === item._id ? 'border border-blue-500' : ''
       }`}
     >
@@ -64,11 +64,11 @@ const SelectAddressScreen = () => {
   );
 
   return (
-    <View className="flex-1 bg-gray-100">
+    <View className="flex-1 bg-white">
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-5 bg-white shadow">
+      <View className="flex-row items-center justify-between px-4 py-5 mt-5 ">
         <Text className="text-xl font-bold">Shipping Address</Text>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => router.push('/(tabs)/profile')}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
       </View>

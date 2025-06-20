@@ -26,7 +26,7 @@ const Products: React.FC<ProductsProps> = ({ products }) => {
       {products.map((product) => (
         <TouchableOpacity
           key={product.product_id}
-          className="bg-white rounded-xl shadow-md mb-4 w-[48%] overflow-hidden border border-gray-200"
+          className="bg-white rounded-xl shadow-md mb-4 w-[32%] overflow-hidden border border-gray-200"
           style={{ elevation: 3 }}
           onPress={() => {
             router.push(`/productDetails/${product.product_id}`);

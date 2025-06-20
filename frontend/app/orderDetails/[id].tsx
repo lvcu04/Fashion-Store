@@ -76,7 +76,7 @@ const OrderDetail = () => {
               console.error("❌ Huỷ thất bại:", result);
               Alert.alert("Lỗi", result?.error || "Không thể huỷ đơn hàng.");
             }
-            router.push('/(tabs)/myOrder')
+            router.push('/(tabs)/Order')
           } catch (err) {
             console.error("❌ Lỗi mạng khi huỷ:", err);
             Alert.alert("Lỗi", "Đã xảy ra lỗi khi huỷ đơn hàng.");
@@ -115,11 +115,14 @@ const OrderDetail = () => {
   return (
    <ScrollView className="flex-1 bg-white px-5 pt-1 pb-10">
     {/* Back button */}
-    <TouchableOpacity onPress={() => router.back()} className="mb-4">
-      <AntDesign name="arrowleft" size={24} color="#000" />
-    </TouchableOpacity>
+    <View className='flex flex-row pt-12 pb-4  items-center'>
+      <TouchableOpacity  onPress={() => router.push('/(tabs)/Order')} className="mr-4">
+        <AntDesign name="arrowleft" size={24} color="#000" />
+      </TouchableOpacity>
 
-    <Text className="text-3xl font-bold text-black mb-6">Order Details</Text>
+      <Text className="text-3xl font-bold text-black ">Order Details</Text>
+    </View>
+    
 
     {orderData && (
       <View className="bg-gray-50 rounded-xl p-4 shadow-md border border-gray-200 pb-6">

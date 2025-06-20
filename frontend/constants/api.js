@@ -61,6 +61,8 @@ export const API = {
     getPaymentMethodSetTrue: `${BASE_URL}/api/user/getPaymentMethodSetTrue`,
     addPaymentMethod: `${BASE_URL}/api/user/addPaymentMethod`,
     updatePaymentMethod: `${BASE_URL}/api/user/updatePaymentMethod`,
+    //CHANGEPASSWORD
+    changePass : `${BASE_URL}/api/user/changePassword`,
   },
    cart: {
     getCartByUser: `${BASE_URL}/api/cart/`,

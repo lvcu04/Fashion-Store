@@ -21,4 +21,6 @@ router.get('/getPaymentMethod',authMiddleware.VerifyToken, userController.getPay
 router.get('/getPaymentMethodSetTrue',authMiddleware.VerifyToken, userController.getPaymentMethodSetTrue); // http://localhost:5000/api/user/getPaymentMethodSetTrue
 router.post('/addPaymentMethod',authMiddleware.VerifyToken, userController.addPaymentMethod); // http://localhost:5000/api/user/addPaymentMethod
 router.put('/updatePaymentMethod',authMiddleware.VerifyToken, userController.updatePaymentMethod); // http://localhost:5000/api/user/updatePaymentMethod
+//CHANGEPASSWORD
+router.put('/changePassword',authMiddleware.VerifyToken, userController.changePassword); // http://localhost:5000/api/user/changePassword
 module.exports = router;

@@ -328,6 +328,35 @@ const userController = {
         res.status(500).json({ error: 'Lỗi server khi thêm phương thức thanh toán' });
       }
     },
+   changePassword: async (req, res) => {
+      try {
+        const { uid, name } = req.user;
+        const { newPassword } = req.body;
+
+        if (!uid || !newPassword) {
+          return res.status(400).json({ message: 'Thiếu uid hoặc mật khẩu mới!' });
+        }
+
+        await admin.auth().updateUser(uid, { password: newPassword });
+
+        return res.status(200).json({
+          message: `Đổi mật khẩu cho '${name}' thành công`,
+        });
+      } catch (error) {
+        console.error("Lỗi khi đổi mật khẩu:", error);
+
+        // Nếu là lỗi từ Firebase
+        const errorMessage =
+          error?.errorInfo?.message ||
+          error.message ||
+          'Đổi mật khẩu thất bại';
+
+        return res.status(500).json({
+          message: 'Đổi mật khẩu thất bại',
+          error: errorMessage,
+        });
+      }
+    },
 
    
 
