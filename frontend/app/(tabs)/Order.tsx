@@ -5,6 +5,7 @@ import { useAuth } from '@/context/authContext';
 import { useRouter } from 'expo-router';
 import { useAnimatedStyle, useSharedValue, withTiming, Easing } from 'react-native-reanimated';
 import { AntDesign } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 export interface CartItem {
   product_id: string;
@@ -43,23 +44,14 @@ const MyOrder = () => {
   const [activeTab, setActiveTab] = useState<'Ongoing' | 'Completed'>('Ongoing');
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        scale: withTiming(scale.value, {
-          duration: 150,
-          easing: Easing.ease,
-        }),
-      },
-    ],
-    opacity: withTiming(opacity.value, {
-      duration: 150,
-      easing: Easing.ease,
-    }),
+    transform: [{ scale: withTiming(scale.value, { duration: 150, easing: Easing.ease }) }],
+    opacity: withTiming(opacity.value, { duration: 150, easing: Easing.ease }),
   }));
 
   const handlePressIn = () => {
@@ -72,33 +64,39 @@ const MyOrder = () => {
     opacity.value = 1;
   };
 
-  useEffect(() => {
-    const fetchOrdersUid = async () => {
-      try {
-        const token = await firebaseUser?.getIdToken();
-        const res = await fetch(API.order.allOrdersUid, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await res.json();
-        setOrders(data);
-      } catch (error) {
-        console.error('Failed to fetch orders:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchOrdersUid = async () => {
+    try {
+      const token = await firebaseUser?.getIdToken();
+      const res = await fetch(API.order.allOrdersUid, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setOrders(data);
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchOrdersUid();
   }, []);
-  //hàm lọc các trạng thái 
+
   const filterOrders = (status: 'Ongoing' | 'Completed') => {
     return orders.filter((order) =>
-      status === 'Ongoing'//nếu là Ongoing thì sẽ hiển thị các trạng thái success và cancelled
+      status === 'Ongoing'
         ? order.order_status !== 'success' && order.order_status !== 'cancelled'
         : order.order_status === 'success'
     );
+  };
+
+  const statusLabels: Record<OrderStatus, string> = {
+    pending: t('pending'),
+    paid: t('paid'),
+    shipped: t('shipped'),
+    success: t('success'),
+    cancelled: t('cancelled'),
   };
 
   const renderOrderItem = ({ item }: { item: Order }) => {
@@ -115,47 +113,44 @@ const MyOrder = () => {
           )}
           <View className="ml-4 flex-1">
             <Text className="text-lg font-semibold text-gray-900">{firstItem?.productName}</Text>
-            <Text className="text-sm text-gray-600 mt-1">Quantity: {firstItem?.quantity}</Text>
+            <Text className="text-sm text-gray-600 mt-1">
+              {t('Quantity')}: {firstItem?.quantity}
+            </Text>
             <Text className="text-xl font-bold text-gray-800 mt-2">
               {item.total_price?.toLocaleString("vi-VN")} VND
             </Text>
           </View>
         </View>
+
         <View className="border-t border-gray-200 mt-4 pt-3">
-          <View className="flex-row justify-between">
-            <View>
+          <View className="flex-row items-start">
+            <View className="flex-1">
               <Text className="text-sm text-gray-500">
-                Order Date: {new Date(item.order_date || '').toDateString()}
+                {t('Order Date')}: {new Date(item.order_date || '').toDateString()}
               </Text>
-              <Text className="text-sm text-gray-500">Order ID: {item.order_id}</Text>
+              <Text className="text-sm text-gray-500">{t('Order ID')}: {item.order_id}</Text>
             </View>
+
             <Text
-              className={`text-sm font-semibold ${
+              className={`text-sm font-semibold ml-4 ${
                 item.order_status === 'success' ? 'text-green-600' : 'text-orange-500'
               }`}
             >
-              {item.order_status}
+              {statusLabels[item.order_status ?? 'pending']}
             </Text>
           </View>
+
           <Animated.View style={animatedStyle} className="mt-3">
             <TouchableOpacity
-              key={item.order_id}
-              onPressIn={() => {
-                console.log('order_id sẽ truyền', item.order_id);
-                handlePressIn();
-              }}
-              onPressOut={()=>{handlePressOut();
-
-                // router.push(`/orderDetail?order_id=${item.order_id}`);
+              onPressIn={() => handlePressIn()}
+              onPressOut={() => {
+                handlePressOut();
                 router.push(`/orderDetails/${item.order_id}`);
               }}
-              
               className="bg-gray-900 rounded-full py-2 px-4 flex-row items-center justify-center"
             >
               <AntDesign name="eye" size={16} color="white" />
-              <Text className="text-white font-semibold ml-2">
-                View Order
-              </Text>
+              <Text className="text-white font-semibold ml-2">{t('View Order')}</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -167,9 +162,10 @@ const MyOrder = () => {
 
   return (
     <View className="flex-1 bg-gray-50">
-      <View className="bg-white pt-12 pb-4 px-5 ">
-        <Text className="text-3xl font-bold text-black ml-4">My Orders</Text>
+      <View className="bg-white pt-12 pb-4 px-5">
+        <Text className="text-3xl font-bold text-black ml-4">{t('My Order')}</Text>
       </View>
+
       <View className="bg-white px-5 pb-5">
         <View className="flex-row mt-5">
           {['Ongoing', 'Completed'].map((tab) => (
@@ -185,7 +181,7 @@ const MyOrder = () => {
                   activeTab === tab ? 'text-white' : 'text-gray-700'
                 }`}
               >
-                {tab}
+                {t(tab)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -194,16 +190,16 @@ const MyOrder = () => {
 
       {loading ? (
         <View className="flex-1 items-center justify-center px-4">
-          <Text className="text-gray-500 text-lg">Loading...</Text>
+          <Text className="text-gray-500 text-lg">{t('Loading...')}</Text>
         </View>
       ) : filteredOrders.length === 0 ? (
         <View className="flex-1 items-center justify-center px-4">
           <AntDesign name="shoppingcart" size={50} color="#d1d5db" />
           <Text className="text-xl font-semibold text-gray-500 mt-4">
-            No {activeTab} Orders
+            {t(`No ${activeTab} Orders`)}
           </Text>
           <Text className="text-sm text-gray-400 mt-2">
-            Start shopping to see your orders here!
+            {t('Start shopping to see your orders here!')}
           </Text>
         </View>
       ) : (
@@ -212,7 +208,7 @@ const MyOrder = () => {
           renderItem={renderOrderItem}
           keyExtractor={(item) => item._id ?? item.order_id ?? Math.random().toString()}
           showsVerticalScrollIndicator={false}
-          ListFooterComponent={<View className="h-6" />} 
+          ListFooterComponent={<View className="h-6" />}
         />
       )}
     </View>

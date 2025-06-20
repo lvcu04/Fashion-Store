@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-
+import { getAuth, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { useAuth } from "@/context/authContext";
 import { useTranslation } from 'react-i18next';
 import { API } from "@/constants/api";
@@ -30,6 +30,7 @@ const UserProfile = () => {
   const [selectedLanguage, setSelectedLanguage] = React.useState("English");
   const [showChangePass, setShowChangePass] = React.useState(false);
   const [newPassword, setNewPassword] = React.useState('');
+  const [oldPassword, setOldPassword] = React.useState('');
   const [isLanguageModalVisible, setLanguageModalVisible] = React.useState(false);
 
   const renderLanguageItem = ({ item }: { item: string }) => (
@@ -53,30 +54,45 @@ const UserProfile = () => {
   }
 
   const handleChangePassword = async () => {
-      try {
-        const token = await firebaseUser?.getIdToken();
+  try {
+    const auth = getAuth();
+    const user = auth.currentUser;
 
-        const res = await fetch(API.user.changePass, {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ newPassword }),
-        });
+    if (!user || !oldPassword || !newPassword) {
+      Alert.alert("Lỗi", "Vui lòng nhập đầy đủ mật khẩu cũ và mới");
+      return;
+    }
 
-        const data = await res.json();
+    const credential = EmailAuthProvider.credential(user.email!, oldPassword);
 
-        if (!res.ok) throw new Error(data.message || 'Đổi mật khẩu thất bại');
+    // Xác thực lại bằng mật khẩu cũ
+    await reauthenticateWithCredential(user, credential);
 
-        Alert.alert('Thành công', 'Đã đổi mật khẩu');
-        setShowChangePass(false);
-        setNewPassword('');
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        Alert.alert('Lỗi', message);
-      }
-    };
+    // Nếu xác thực thành công thì gọi API đổi mật khẩu
+    const token = await user.getIdToken();
+
+    const res = await fetch(API.user.changePass, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ newPassword }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Đổi mật khẩu thất bại');
+
+    Alert.alert('Thành công', 'Đã đổi mật khẩu');
+    setShowChangePass(false);
+    setOldPassword('');
+    setNewPassword('');
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    Alert.alert('Lỗi', message);
+  }
+};
+
 
 
   return (
@@ -151,34 +167,41 @@ const UserProfile = () => {
     </ScrollView>
     {showChangePass && (
       <Modal
-        visible={showChangePass}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setShowChangePass(false)}
-      >
-        <TouchableWithoutFeedback onPress={() => setShowChangePass(false)}>
-          <View className="flex-1 justify-center items-center bg-black/40">
-            <TouchableWithoutFeedback>
-              <View className="bg-white w-[90%] rounded-2xl p-5">
-                <Text className="text-lg font-bold mb-3">Change Password</Text>
-                <TextInput
-                  placeholder="New Password"
-                  secureTextEntry
-                  className="border border-gray-300 rounded-lg px-3 py-2 mb-4"
-                  value={newPassword}
-                  onChangeText={setNewPassword}
-                />
-                <TouchableOpacity
-                  className="bg-blue-500 py-2 rounded-lg"
-                  onPress={handleChangePassword}
-                >
-                  <Text className="text-white text-center">Confirm</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+          visible={showChangePass}
+          animationType="slide"
+          transparent
+          onRequestClose={() => setShowChangePass(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => setShowChangePass(false)}>
+            <View className="flex-1 justify-center items-center bg-black/40">
+              <TouchableWithoutFeedback>
+                <View className="bg-white w-[90%] rounded-2xl p-5">
+                  <Text className="text-lg font-bold mb-3">Change Password</Text>
+                  <TextInput
+                    placeholder="Old Password"
+                    secureTextEntry
+                    className="border border-gray-300 rounded-lg px-3 py-2 mb-3"
+                    value={oldPassword}
+                    onChangeText={setOldPassword}
+                  />
+                  <TextInput
+                    placeholder="New Password"
+                    secureTextEntry
+                    className="border border-gray-300 rounded-lg px-3 py-2 mb-4"
+                    value={newPassword}
+                    onChangeText={setNewPassword}
+                  />
+                  <TouchableOpacity
+                    className="bg-blue-500 py-2 rounded-lg"
+                    onPress={handleChangePassword}
+                  >
+                    <Text className="text-white text-center">Confirm</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
     )}
     </>
   );

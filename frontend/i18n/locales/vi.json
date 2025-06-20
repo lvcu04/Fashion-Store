@@ -18,19 +18,36 @@
   "User Profile": "Hồ sơ người dùng",
   "Full Name": "Họ và tên",
   "Personal Details": "Thông tin cá nhân",
-  "My Order": "Đơn hàng của tôi",
+  
   "My Favourites": "Yêu thích",
   "Shipping Address": "Địa chỉ giao hàng",
   "My Card": "Thẻ của tôi",
   "Settings": "Cài đặt",
-  "My Cart": "Giỏ hàng",
+  "My Cart": "Giỏ hàng của tôi",
   "FAQs": "Câu hỏi thường gặp",
   "Privacy Policy": "Chính sách bảo mật",
   "Logout": "Đăng xuất",
+  "My Order": "Đơn hàng của tôi",
+  "Ongoing": "Đang xử lý",
+  "Completed": "Đã hoàn tất",
+  "Quantity": "Số lượng",
+  "Order Date": "Ngày đặt hàng",
+  "Order ID": "Mã đơn hàng",
+  "View Order": "Xem đơn hàng",
+
+  "paid": "Đã thanh toán",
+  "shipped": "Đang giao",
+  "success": "Hoàn tất",
+  "cancelled": "Đã huỷ",
+
+  "No Ongoing Orders": "Không có đơn hàng đang xử lý",
+  "No Completed Orders": "Không có đơn hàng đã hoàn tất",
+  "Start shopping to see your orders here!": "Bắt đầu mua sắm để xem đơn hàng của bạn tại đây!",
 
   "account": "Tài khoản",
   "notifications": "Thông báo",
   "privacy": "Quyền riêng tư",
+  "pending" : "Chờ xử lý",
   "language": "Ngôn ngữ",
   "help": "Trợ giúp",
   "resetSettings": "Đặt lại cài đặt",
@@ -61,7 +78,23 @@
 
    
   "My Notifications":"Thông báo của tôi",
-  
+
+
+
+  "The order is paiding": "Đơn hàng đang được thanh toán",
+  "The order has been completed": "Đơn hàng đã hoàn thành",
+  "The order has been shipped": "Đơn hàng đã được giao",
+  "The order has been canceled": "Đơn hàng đã bị hủy",
+  "Unknown": "Không xác định",
+
+  "Paid": "Đã thanh toán",
+
+  "Delivered": "Đã giao",
+  "Cancelled": "Đã hủy",
+
+
+  "product": "sản phẩm",
+  "products": "sản phẩm",
   "Language": "Ngôn ngữ",
   "Notification": "Thông báo",
   "Dark Mode": "Chế độ tối",
@@ -71,6 +104,24 @@
   "Success":"Thành công",
   "Receiver": "Người nhận",
 
+
+   "Order Details": "Chi tiết đơn hàng",
+  
+  "No image": "Không có ảnh",
+  "Qty": "Số lượng",
+ 
+  "Payment Method": "Phương thức thanh toán",
+  "Order Status": "Trạng thái đơn hàng",
+  "Cancel Order": "Huỷ đơn hàng",
+  "Confirm Cancel": "Xác nhận huỷ",
+  "Are you sure you want to cancel this order?": "Bạn có chắc muốn huỷ đơn hàng này?",
+  "No": "Không",
+ 
+  "Order has been cancelled.": "Đơn hàng đã được huỷ.",
+  "Error": "Lỗi",
+  "Unable to cancel order.": "Không thể huỷ đơn hàng.",
+  "An error occurred while cancelling the order.": "Đã xảy ra lỗi khi huỷ đơn hàng.",
+ 
 
   "No notifications found":"Không có thông báo được tìm thấy",
   

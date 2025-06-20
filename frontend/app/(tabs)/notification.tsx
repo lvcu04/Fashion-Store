@@ -15,65 +15,57 @@ import { useAuth } from '@/context/authContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 
-
-const getStatusInfo = (status: string) => {
-  switch (status.trim().toLowerCase()) {
-    case 'paid':
-      return {
-        title: 'The order is paiding',
-        label: 'Paid',
-        color: '#3B82F6',
-        bgColor: '#DBEAFE',
-        icon: 'payments',
-      };
-    case 'success':
-      return {
-        title: 'The order has been completed',
-        label: 'Success',
-        color: '#10B981',
-        bgColor: '#D1FAE5',
-        icon: 'check-circle',
-      };
-    case 'delivered':
-      return {
-        title: 'The order has been shipped ',
-        label: 'Delivered',
-        color: '#8B5CF6',
-        bgColor: '#EDE9FE',
-        icon: 'local-shipping',
-      };
-    case 'cancelled':
-      return {
-        title: 'The order has been canceled ',
-        label: 'Cancelled',
-        color: '#EF4444',
-        bgColor: '#FEE2E2',
-        icon: 'cancel',
-      };
-    default:
-      return {
-        title: 'Unknown',
-        label: 'Unknown',
-        color: '#6B7280',
-        bgColor: '#F3F4F6',
-        icon: 'help-outline',
-      };
-  }
-};
-
-type NotificationType = {
-  _id: string;
-  order_id: string;
-  order_date: string;
-  order_status: string;
-  total_price: number;
-  cartItems: { image: string }[];
-};
-
 const NotificationItem: React.FC<{ item: NotificationType; onPress: () => void }> = ({
   item,
   onPress,
 }) => {
+  const { t } = useTranslation();
+
+  const getStatusInfo = (status: string) => {
+    switch (status.trim().toLowerCase()) {
+      case 'paid':
+        return {
+          title: t('The order is paiding'),
+          label: t('Paid'),
+          color: '#3B82F6',
+          bgColor: '#DBEAFE',
+          icon: 'payments',
+        };
+      case 'success':
+        return {
+          title: t('The order has been completed'),
+          label: t('Success'),
+          color: '#10B981',
+          bgColor: '#D1FAE5',
+          icon: 'check-circle',
+        };
+      case 'delivered':
+        return {
+          title: t('The order has been shipped'),
+          label: t('Delivered'),
+          color: '#8B5CF6',
+          bgColor: '#EDE9FE',
+          icon: 'local-shipping',
+        };
+      case 'cancelled':
+        return {
+          title: t('The order has been canceled'),
+          label: t('Cancelled'),
+          color: '#EF4444',
+          bgColor: '#FEE2E2',
+          icon: 'cancel',
+        };
+      default:
+        return {
+          title: t('Unknown'),
+          label: t('Unknown'),
+          color: '#6B7280',
+          bgColor: '#F3F4F6',
+          icon: 'help-outline',
+        };
+    }
+  };
+
   const statusInfo = getStatusInfo(item.order_status);
   const dateObj = new Date(item.order_date);
   const dateStr = dateObj.toLocaleDateString();
@@ -121,24 +113,33 @@ const NotificationItem: React.FC<{ item: NotificationType; onPress: () => void }
 
       <View className="flex-row justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
         <Text className="text-sm text-gray-700">
-          Total:{' '}
+          {t('Total')}:{" "}
           <Text className="font-semibold text-gray-900">
             {item.total_price.toLocaleString()} VND
           </Text>
         </Text>
         <Text className="text-sm text-gray-700">
-          {item.cartItems.length} product{item.cartItems.length > 1 ? 's' : ''}
+          {item.cartItems.length}{' '}
+          {t(item.cartItems.length > 1 ? 'products' : 'product')}
         </Text>
       </View>
     </TouchableOpacity>
   );
 };
 
+type NotificationType = {
+  _id: string;
+  order_id: string;
+  order_date: string;
+  order_status: string;
+  total_price: number;
+  cartItems: { image: string }[];
+};
+
 const Notification: React.FC = () => {
   const router = useRouter();
   const { t } = useTranslation();
   const { firebaseUser } = useAuth();
-
 
   const [notification, setNotification] = useState<NotificationType[]>([]);
 
@@ -174,19 +175,14 @@ const Notification: React.FC = () => {
     merged.sort((a, b) => new Date(b.order_date).getTime() - new Date(a.order_date).getTime());
 
     setNotification(merged);
-
-    
   };
 
-  // Load ban đầu
   useEffect(() => {
     if (firebaseUser) {
       fetchAllNotifications();
-      
     }
   }, [firebaseUser]);
 
-  // App resume
   useEffect(() => {
     const sub = AppState.addEventListener('change', (next) => {
       if (next === 'active' && firebaseUser) fetchAllNotifications();
@@ -194,7 +190,6 @@ const Notification: React.FC = () => {
     return () => sub.remove();
   }, [firebaseUser]);
 
-  // Xoá badge khi vào tab
   useFocusEffect(
     useCallback(() => {
       if (firebaseUser) {

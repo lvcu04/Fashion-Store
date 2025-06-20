@@ -140,7 +140,7 @@ const ProductDetailScreen = () => {
       <ScrollView className="flex-1 bg-slate-50">
         {/* Back & Wishlist */}
         <View className="flex-row justify-between items-center px-4 py-2 mt-5">
-          <TouchableOpacity  onPress={() => router.back()}>
+          <TouchableOpacity  onPress={() => router.push('/(tabs)/home')}>
             <Ionicons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
           

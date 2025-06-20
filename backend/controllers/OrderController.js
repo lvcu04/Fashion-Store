@@ -86,7 +86,7 @@ const orderController = {
         try {
             const orders = await Order.find().sort({ createdAt: -1 }); // sắp xếp mới nhất trước
             res.status(200).json(orders);
-            console.log("✅ Đã lấy tất cả đơn hàng", orders);
+            // console.log("✅ Đã lấy tất cả đơn hàng", orders);
         } catch (error) {
             console.error("❌ Error fetching orders:", error);
             res.status(500).json({ error: 'Error fetching orders' });
