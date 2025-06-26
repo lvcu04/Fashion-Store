@@ -103,9 +103,9 @@
   "Order":"Đặt hàng",
   "Success":"Thành công",
   "Receiver": "Người nhận",
-
-
-   "Order Details": "Chi tiết đơn hàng",
+  "item":"mặt hàng",
+  "Process to checkout":" Tiến hành thanh toán",
+  "Order Details": "Chi tiết đơn hàng",
   
   "No image": "Không có ảnh",
   "Qty": "Số lượng",
@@ -152,6 +152,43 @@
     "product": "{{count}} sản phẩm",
     "empty": "Chưa có thông báo nào.",
     "viewOrders": "Xem đơn hàng"
-  }
+  },
+  
+  "Shipping address": "Địa chỉ giao hàng",
+  "No address selected": "Chưa chọn địa chỉ",
+  "Change": "Thay đổi",
+  "Payment": "Phương thức thanh toán",
+  "No method selected": "Chưa chọn phương thức",
+ 
+  "Delivery": "Phí vận chuyển",
+  "Summary": "Tổng cộng",
+  "SUBMIT ORDER": "ĐẶT HÀNG",
+
+   "Add New Address": "Thêm địa chỉ mới",
+
+  "Street": "Địa chỉ",
+  "City": "Thành phố",
+  "e.g. John Doe": "VD: Nguyễn Văn A",
+  "e.g. 123 Main St": "VD: 123 Nguyễn Trãi",
+  "e.g. New York": "VD: Hà Nội",
+  "Save Address": "Lưu địa chỉ",
+  "Edit Address": "Chỉnh sửa địa chỉ",
+  "Enter receiver name": "Nhập tên người nhận",
+  "Enter street": "Nhập địa chỉ",
+  "Enter city": "Nhập thành phố",
+  "Save Changes": "Lưu thay đổi",
+
+ 
+  "Name": "Tên",
+ 
+  "Edit": "Chỉnh sửa",
+  "Delete": "Xoá",
+  "Use as the shipping address": "Sử dụng làm địa chỉ giao hàng",
+  "My Payment Methods": "Phương thức thanh toán",
+  "Momo": "Momo",
+  "Cash on Delivery": "Thanh toán khi nhận hàng",
+  "Add Card": "Thêm thẻ",
+  "Coming Soon": "Sắp ra mắt",
+  "Card support will be added later.": "Hỗ trợ thêm thẻ sẽ được cập nhật sau."
 }
 

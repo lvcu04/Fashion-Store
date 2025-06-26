@@ -4,14 +4,14 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/authContext';
 import { API } from '@/constants/api';
 import { Ionicons } from '@expo/vector-icons';
-
+import { useTranslation } from 'react-i18next';
 const AddAddressScreen = () => {
   const router = useRouter();
   const { firebaseUser } = useAuth();
   const [receiverName, setReceiverName] = useState('');
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
-
+  const { t } = useTranslation();
   const handleAddAddress = async () => {
     if (!receiverName || !street || !city) {
       Alert.alert('Missing info', 'Please fill in all fields');
@@ -53,46 +53,49 @@ const AddAddressScreen = () => {
   };
 
   return (
-    <View className="flex-1 bg-white px-4 pt-6">
-      {/* Header */}
-      <View className="mb-6 flex flex-row justify-between">
-        <Text className="text-xl font-bold">Add New Address</Text>
-        <TouchableOpacity onPress={() => router.push('/(checkout)/checkout')}><Ionicons name='arrow-back' size={24}/></TouchableOpacity>
+     <View className="flex-1 bg-white px-4 pt-6">
+        {/* Header */}
+        <View className="mb-6 flex flex-row justify-between">
+          <Text className="text-xl font-bold">{t('Add New Address')}</Text>
+          <TouchableOpacity onPress={() => router.push('/(checkout)/checkout')}>
+            <Ionicons name='arrow-back' size={24} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Form fields */}
+        <Text className="mb-1 text-gray-700">{t('Full Name')}</Text>
+        <TextInput
+          className="border border-gray-300 rounded-xl px-4 py-2 mb-4"
+          placeholder={t("e.g. John Doe")}
+          value={receiverName}
+          onChangeText={setReceiverName}
+      />
+
+        <Text className="mb-1 text-gray-700">{t('Street')}</Text>
+        <TextInput
+          className="border border-gray-300 rounded-xl px-4 py-2 mb-4"
+          placeholder={t("e.g. 123 Main St")}
+          value={street}
+          onChangeText={setStreet}
+      />
+
+        <Text className="mb-1 text-gray-700">{t('City')}</Text>
+        <TextInput
+          className="border border-gray-300 rounded-xl px-4 py-2 mb-6"
+          placeholder={t("e.g. New York")}
+          value={city}
+          onChangeText={setCity}
+      />
+
+        {/* Save button */}
+        <TouchableOpacity
+          onPress={handleAddAddress}
+          className="bg-black py-3 rounded-xl items-center"
+        >
+          <Text className="text-white text-base font-semibold">{t('Save Address')}</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Form fields */}
-      <Text className="mb-1 text-gray-700">Full Name</Text>
-      <TextInput
-        className="border border-gray-300 rounded-xl px-4 py-2 mb-4"
-        placeholder="e.g. John Doe"
-        value={receiverName}
-        onChangeText={setReceiverName}
-      />
-
-      <Text className="mb-1 text-gray-700">Street</Text>
-      <TextInput
-        className="border border-gray-300 rounded-xl px-4 py-2 mb-4"
-        placeholder="e.g. 123 Main St"
-        value={street}
-        onChangeText={setStreet}
-      />
-
-      <Text className="mb-1 text-gray-700">City</Text>
-      <TextInput
-        className="border border-gray-300 rounded-xl px-4 py-2 mb-6"
-        placeholder="e.g. New York"
-        value={city}
-        onChangeText={setCity}
-      />
-
-      {/* Save button */}
-      <TouchableOpacity
-        onPress={handleAddAddress}
-        className="bg-black py-3 rounded-xl items-center"
-      >
-        <Text className="text-white text-base font-semibold">Save Address</Text>
-      </TouchableOpacity>
-    </View>
   );
 };
 

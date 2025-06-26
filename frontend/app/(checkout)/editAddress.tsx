@@ -4,12 +4,12 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/context/authContext';
 import { API } from '@/constants/api';
-
+import { useTranslation } from 'react-i18next';
 const EditAddressScreen = () => {
   const { firebaseUser } = useAuth();
   const router = useRouter();
   const { selectedAddress } = useLocalSearchParams();//bên editAddress.tsx sẽ lấy giá trị đã được truyền từ router vs tham số selectedAddress
-
+  const { t } = useTranslation();
   const [addressId, setAddressId] = useState('');
   const [receiver, setReceiver] = useState('');
   const [streetName, setStreetName] = useState('');
@@ -66,44 +66,45 @@ const EditAddressScreen = () => {
 
   return (
     <View className="flex-1 bg-white p-4">
-      <View className="flex-row items-center mb-4">
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="black" />
+        <View className="flex-row items-center my-4">
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+          <Text className="text-xl font-bold ml-4">{t('Edit Address')}</Text>
+        </View>
+
+        <Text className="mb-1">{t('Full Name')}</Text>
+        <TextInput
+          value={receiver}
+          onChangeText={setReceiver}
+          placeholder={t('Enter receiver name')}
+          className="border border-gray-300 rounded-lg px-4 py-2 mb-4"
+      />
+
+        <Text className="mb-1">{t('Street')}</Text>
+        <TextInput
+          value={streetName}
+          onChangeText={setStreetName}
+          placeholder={t('Enter street')}
+          className="border border-gray-300 rounded-lg px-4 py-2 mb-4"
+      />
+
+        <Text className="mb-1">{t('City')}</Text>
+        <TextInput
+          value={cityName}
+          onChangeText={setCityName}
+          placeholder={t('Enter city')}
+          className="border border-gray-300 rounded-lg px-4 py-2 mb-6"
+      />
+
+        <TouchableOpacity
+          onPress={handleUpdateAddress}
+          className="bg-black py-3 rounded-lg"
+        >
+          <Text className="text-white text-center font-semibold">{t('Save Changes')}</Text>
         </TouchableOpacity>
-        <Text className="text-xl font-bold ml-4">Edit Address</Text>
       </View>
 
-      <Text className="mb-1">Full Name</Text>
-      <TextInput
-        value={receiver}
-        onChangeText={setReceiver}
-        placeholder="Enter receiver name"
-        className="border border-gray-300 rounded-lg px-4 py-2 mb-4"
-      />
-
-      <Text className="mb-1">Street</Text>
-      <TextInput
-        value={streetName}
-        onChangeText={setStreetName}
-        placeholder="Enter street"
-        className="border border-gray-300 rounded-lg px-4 py-2 mb-4"
-      />
-
-      <Text className="mb-1">City</Text>
-      <TextInput
-        value={cityName}
-        onChangeText={setCityName}
-        placeholder="Enter city"
-        className="border border-gray-300 rounded-lg px-4 py-2 mb-6"
-      />
-
-      <TouchableOpacity
-        onPress={handleUpdateAddress}
-        className="bg-black py-3 rounded-lg"
-      >
-        <Text className="text-white text-center font-semibold">Save Changes</Text>
-      </TouchableOpacity>
-    </View>
   );
 };
 

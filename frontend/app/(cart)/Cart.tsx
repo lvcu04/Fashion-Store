@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useCart } from "@/context/cartContext";
-
+import { useTranslation } from "react-i18next";
 
 type CartItem = {
   product_id: string;
@@ -22,6 +22,7 @@ type CartItem = {
 };
 
 const MyCart = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const {
     cart: cartItems, // dùng trực tiếp từ server
@@ -117,14 +118,15 @@ const MyCart = () => {
 if (cartIsEmpty) {
   console.log("cartItems rỗng hoặc không tồn tại", cartItems);
 }
-
+  
   return (
+    
     <View className="flex-1 bg-gray-50">
       <View className="bg-white pt-12 pb-4 px-5 flex-row items-center">
         <TouchableOpacity onPress={() => router.push("/profile")}> 
           <AntDesign name="arrowleft" size={24} color="#000000" />
         </TouchableOpacity>
-        <Text className="text-3xl font-bold text-black ml-4">My Cart</Text>
+        <Text className="text-3xl font-bold text-black ml-4">{t('My Cart')}</Text>
       </View>
 
       {cartItems.length === 0 ? (
@@ -132,10 +134,10 @@ if (cartIsEmpty) {
         <View className="flex-1 items-center justify-center">
           <AntDesign name="shoppingcart" size={50} color="#d1d5db" />
           <Text className="text-lg font-semibold text-gray-500 mt-4">
-            Your Cart is Empty
+            {('Your Cart is Empty')}
           </Text>
           <Text className="text-sm text-gray-400 mt-2">
-            Start shopping to add items here!
+            {('Start shopping to add items here!')}
           </Text>
         </View>
       ) : (
@@ -150,7 +152,7 @@ if (cartIsEmpty) {
           <View className="bg-white p-5 shadow-sm">
             <View className="flex-row justify-between items-center mb-4">
               <Text className="text-lg text-gray-600">
-                Total ({cartItems.length} item{cartItems.length > 1 ? "s" : ""}):
+                {t('Total')} ({cartItems.length} {t('item')}{cartItems.length > 1 ? "s" : ""}):
               </Text>
               <Text className="text-2xl font-bold text-gray-900">
                 {totalPrice.toLocaleString("vi-VN")}
@@ -161,7 +163,7 @@ if (cartIsEmpty) {
               className="bg-gray-900 rounded-full py-4 flex-row items-center justify-center"
             >
               <Text className="text-white font-semibold text-lg">
-                Process to checkout
+                {t('Process to checkout')}
               </Text>
               <AntDesign
                 name="arrowright"

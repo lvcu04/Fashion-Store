@@ -29,7 +29,7 @@ export interface ShippingAddress {
 }
 
 export type PaymentMethod = "COD" | "MOMO";
-export type OrderStatus = "pending" | "paid" | "shipped" | "success" | "cancelled";
+export type OrderStatus = "pending" | "paid" | "delivered" | "success" | "cancelled";
 
 export interface Order {
   _id?: string;
@@ -107,7 +107,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [orders]);
 
   const filteredOrders = orders.filter((order) =>
     order.shipping_address?.receiverName
@@ -145,13 +145,13 @@ export default function OrdersPage() {
 
       {/* Content */}
       <View className="flex-1">
-        {loading ? (//nếu đang load thì sẽ hiển thị cái vòng tròn loading, load xong thì hiển thị bên dưới 
+        {loading ? (
           <View className="flex-1 justify-center items-center">
             <ActivityIndicator size="large" color="#4F46E5" />
           </View>
         ) : (
           <ScrollView className="px-4 py-2" showsVerticalScrollIndicator={false}>
-            {filteredOrders.map((order) => (//sử dụng filterOrders để map thuận cho hàm tìm kiếm, với biến tên order để duyệt mảng
+            {filteredOrders.map((order) => (
               <View
                 key={order._id}
                 className="bg-white rounded-2xl p-4 mb-4 shadow-md border border-gray-100"
@@ -187,7 +187,7 @@ export default function OrdersPage() {
                         >
                           <Picker.Item label="pending" value="pending" />
                           <Picker.Item label="paid" value="paid" />
-                          <Picker.Item label="shipped" value="shipped" />
+                          <Picker.Item label="delivered" value="delivered" />
                           <Picker.Item label="success" value="success" />
                           <Picker.Item label="cancelled" value="cancelled" />
                         </Picker>

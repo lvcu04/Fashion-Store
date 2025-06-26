@@ -143,7 +143,7 @@ export default function HomeScreen() {
         <Categories categories={categories} onCategorySelect={setSelectedCategoryId} />
       </View>
 
-      {/* Top Products Header */}
+      {/*  Products Header */}
       <View className="flex-row justify-between items-center mb-2">
         <Text className="font-bold text-lg">
           {selectedCategoryId === '' || selectedCategoryId === null

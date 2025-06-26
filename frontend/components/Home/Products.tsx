@@ -22,35 +22,42 @@ const Products: React.FC<ProductsProps> = ({ products }) => {
 
 
   return (
-    <View className="flex-row flex-wrap justify-between px-1">
-      {products.map((product) => (
-        <TouchableOpacity
-          key={product.product_id}
-          className="bg-white rounded-xl shadow-md mb-4 w-[32%] overflow-hidden border border-gray-200"
-          style={{ elevation: 3 }}
-          onPress={() => {
-            router.push(`/productDetails/${product.product_id}`);
-          }}
+    <View className="flex-row flex-wrap gap-3 px-2">
+  {products.map((product) => (
+    <TouchableOpacity
+      key={product.product_id}
+      onPress={() => router.push(`/productDetails/${product.product_id}`)}
+      className="bg-white w-[31.1%] rounded-xl overflow-hidden border border-gray-200 shadow-md"
+      style={{ elevation: 3 }}
+    >
+      {/* Ảnh sản phẩm */}
+      <Image
+        source={{ uri: product.image }}
+        className="w-full h-32"
+        resizeMode="cover" 
+      />
+
+      {/* Thông tin sản phẩm */}
+      <View className="p-3 items-center">
+        <Text
+          className="font-bold text-sm text-gray-900 uppercase"
+          numberOfLines={1}
         >
-          <View >
-            <Image
-              source={{ uri: product.image }}
-              className="w-full h-28 rounded-t-xl"
-              resizeMode="contain"
-            />
-          
-          </View>
-          <View className="p-3 items-center">
-            <Text className="font-bold text-sm text-gray-900 uppercase" numberOfLines={1}>
-              {typeof product.productName === 'string' ? product.productName : 'Unknown Product'}
-            </Text>
-            <Text className="text-gray-900 text-sm font-semibold mt-1">
-              {product.price.toLocaleString('vi-VN')}VNĐ
-            </Text>
-          </View>
-        </TouchableOpacity>
-      ))}
-    </View>
+          {typeof product.productName === 'string'
+            ? product.productName
+            : 'Unknown Product'}
+        </Text>
+        <Text
+          className="text-gray-900 text-sm font-semibold mt-1"
+          numberOfLines={1}
+        >
+          {product.price.toLocaleString('vi-VN')} VNĐ
+        </Text>
+      </View>
+    </TouchableOpacity>
+  ))}
+</View>
+
   );
 };
 
