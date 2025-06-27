@@ -22,7 +22,7 @@ export interface ShippingAddress {
 }
 
 export type PaymentMethod = 'COD' | 'MOMO';
-export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'success' | 'cancelled';
+export type OrderStatus = 'pending' | 'paid' | 'delivered' | 'success' | 'cancelled';
 
 export interface Order {
   _id?: string;
@@ -94,7 +94,7 @@ const MyOrder = () => {
   const statusLabels: Record<OrderStatus, string> = {
     pending: t('pending'),
     paid: t('paid'),
-    shipped: t('shipped'),
+    delivered: t('delivered'),
     success: t('success'),
     cancelled: t('cancelled'),
   };

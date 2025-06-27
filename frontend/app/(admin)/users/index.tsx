@@ -1,30 +1,60 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import { Image, ScrollView, TouchableOpacity, View } from "react-native";
-import { Text } from "react-native-paper";
+import { Avatar, Text } from "react-native-paper";
+import { useAuth } from '@/context/authContext';
+import { API } from '@/constants/api';
+
+
+type User = {
+  uid: string;
+  name:string;
+  email: string;
+}
+
+
 
 const fakeUsers = [
   {
-    id: "U001",
-    name: "Nguyễn Văn A",
-    email: "a@gmail.com",
     avatar: "https://i.pravatar.cc/100?img=1",
   },
   {
-    id: "U002",
-    name: "Trần Thị B",
-    email: "b@gmail.com",
     avatar: "https://i.pravatar.cc/100?img=2",
   },
   {
-    id: "U003",
-    name: "Lê Văn C",
-    email: "c@gmail.com",
     avatar: "https://i.pravatar.cc/100?img=3",
   },
 ];
 
+const mapFakeUsers = fakeUsers.map((user) => ({
+  avatar: user.avatar,
+}))
+
 export default function UsersPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const {firebaseUser} = useAuth();
+  const fetchUsers = async () => {
+    if(!firebaseUser) return;
+    try {
+      const token = await firebaseUser.getIdToken();
+      const response = await fetch(API.user.all, {
+        headers: {
+           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        }
+      });
+      const data = await response.json();
+      setUsers(data);
+      
+    } catch (error) {
+      console.error("bắt error",error);
+    }
+  }
+useEffect(() => {
+  fetchUsers();
+}, []);
+
   return (
     <View className="flex-1 bg-gray-50">
       {/* Header */}
@@ -42,13 +72,13 @@ export default function UsersPage() {
         </View>
       </View>
       <ScrollView className="flex-1 px-4">
-        {fakeUsers.map((user) => (
+        {users.map((user) => (
           <View
-            key={user.id}
+            key={user.uid}
             className="bg-white rounded-2xl p-4 mb-4 shadow-md flex-row items-center border border-gray-100"
           >
             <Image
-              source={{ uri: user.avatar }}
+              source={{ uri: fakeUsers[0].avatar }}
               className="w-14 h-14 rounded-full mr-4 border border-gray-200"
               resizeMode="cover"
             />

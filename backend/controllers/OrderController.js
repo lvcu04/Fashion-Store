@@ -159,7 +159,7 @@ const orderController = {
             console.log(`🔍 Tìm thấy đơn hàng: ${order.order_id}, trạng thái: ${order.order_status}`);
 
             // Nếu đã giao thì không được huỷ
-            if (order.order_status === "shipped") {
+            if (order.order_status === "delivered") {
                 console.log("⚠️ Đơn hàng đang được giao, không thể huỷ");
                 return res.status(400).json({ error: 'Đơn hàng đang giao không thể huỷ' });
             }

@@ -41,7 +41,7 @@ const NotificationItem: React.FC<{ item: NotificationType; onPress: () => void }
         };
       case 'delivered':
         return {
-          title: t('The order has been shipped'),
+          title: t('The order has been delivered'),
           label: t('Delivered'),
           color: '#8B5CF6',
           bgColor: '#EDE9FE',

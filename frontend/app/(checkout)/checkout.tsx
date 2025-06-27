@@ -1,6 +1,6 @@
-import {useRouter } from 'expo-router';
-import React, { useContext, useEffect, useState } from 'react';
-import { Text, View, TouchableOpacity, ScrollView, Image, FlatList } from 'react-native';
+import {useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { Text, View, TouchableOpacity, ScrollView, Image, FlatList, AppState } from 'react-native';
 import { useCart } from "@/context/cartContext";
 import { useAuth } from '@/context/authContext';
 import { AntDesign } from '@expo/vector-icons';
@@ -53,15 +53,7 @@ const Checkout = () => {
   // const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType | null>(null);
   const [address, setAddress] = useState<Address | null>(null);
   const [createOrder] = useState<Order | null>(null);
-
-
   
- 
-  useEffect(() => {
-    if (firebaseUser) {
-      fetchDefaultPaymentMethod();
-    }
-  }, [firebaseUser]);
 
   useEffect(() => {
     if (selectedAddress) {
@@ -69,60 +61,71 @@ const Checkout = () => {
     }
   }, [selectedAddress]);
 
+   useEffect(() => {
+    if (firebaseUser) {
+      fetchDefaultPaymentMethod();
+    }
+  }, [firebaseUser]);
+
+
   const [deliveryMethod, setDeliveryMethod] = useState('fedex');
   //nút đồng bộ lên server
- const handleCheckout = async () => {
-  // console.log('dữ liệu paymentMethod:', selectedPaymentMethod);
-  console.log('dữ liệu address:', address);
-  if (!firebaseUser) return;
+  const handleCheckout = async () => {
+    console.log('dữ liệu address:', address);
+    if (!firebaseUser) return;
+    const token = await firebaseUser.getIdToken();
+    const payload = {
+      uid: firebaseUser.uid,
+      cartItems,
+      total_price: totalPrice, 
+      shipping_address: address,
+      payment_method: selectedPaymentMethod,
+      order_status: selectedPaymentMethod === 'MOMO' ? 'paid' : 'pending'
 
-  const token = await firebaseUser.getIdToken();
+    };
 
-  const payload = {
-    uid: firebaseUser.uid,
-    cartItems,
-    total_price: totalPrice, 
-    shipping_address: address,
-    payment_method: selectedPaymentMethod,
-    order_status: selectedPaymentMethod === 'MOMO' ? 'paid' : 'pending'
-
-  };
-
-  try {
-    if (selectedPaymentMethod === 'COD') {
-      const res = await fetch(API.order.create, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      console.log('✅ COD Order created:', data);
-    } else if (selectedPaymentMethod === 'MOMO') {
-      const res = await fetch(API.momo.create, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-      const momoData = await res.json();
-      if (momoData.payUrl) {
-        console.log('✅ MoMo Order created:', momoData.payUrl);
-        Linking.openURL(momoData.payUrl); // mở trình duyệt hoặc app MoMo
-      } else {
-        console.error('❌ Lỗi Momo:', momoData);
+    try {
+      if (selectedPaymentMethod === 'COD') {
+        const res = await fetch(API.order.create, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        // console.log('✅ COD Order created:', data);
+        router.push('/(checkout)/success'); 
+      } else if (selectedPaymentMethod === 'MOMO') {
+        const res = await fetch(API.momo.create, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const momoData = await res.json();
+          if (momoData.deeplinkMiniApp) {//link này sẽ chờ ở trang thanh toán sau đó mở trang thanh toán của momo luôn
+            await router.push('/(checkout)/waitting'); // Chuyển sang trang /waiting
+            // Đợi 5 giây trước khi mở MoMo
+            setTimeout(() => {
+              Linking.openURL(momoData.deeplinkMiniApp);
+              console.log('✅ Đã mở mini app momo:', momoData.deeplinkMiniApp);
+            }, 4000);
+          }else if (momoData.deeplink) {//link này mở thẳng qua trang thanh toán, ko qua màn hình chờ
+            await Linking.openURL(momoData.deeplink);
+            console.log('đã mở deeplink momo');
+          } else {
+            await Linking.openURL(momoData.payUrl);//link này phải nhảy qua link gg r mới nhảy vào
+            console.log('đã mở payUrl momo');
+          }
       }
+    } catch (error) {
+      console.error('❌ Checkout error:', error);
     }
-  } catch (error) {
-    console.error('❌ Checkout error:', error);
-  }
-};
-
- 
+  };
 
 
   // const deliveryCost = 15;
@@ -247,7 +250,7 @@ const Checkout = () => {
               handleCheckout();
               await fetchCartItems();
               await loadAllStocks([]);
-              router.push('/(checkout)/success');
+              
             }}
             className="bg-red-500 p-4 rounded-xl"
           >

@@ -48,7 +48,7 @@ export const API = {
 
   user: {
     role: `${BASE_URL}/api/user/role`,
-    all: `${BASE_URL}/api/user/allUser`,
+    all: `${BASE_URL}/api/user/all`,
     getById: `${BASE_URL}/api/user/`,
     register:`${BASE_URL}/api/user/register`,
     //SHIPPING ADDRESS

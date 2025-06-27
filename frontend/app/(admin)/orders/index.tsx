@@ -107,7 +107,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     fetchOrders();
-  }, [orders]);
+  }, []);
 
   const filteredOrders = orders.filter((order) =>
     order.shipping_address?.receiverName

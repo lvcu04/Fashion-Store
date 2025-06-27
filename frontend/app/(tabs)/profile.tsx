@@ -53,7 +53,7 @@ const Profile = () => {
   ];
 
   return (
-    <ScrollView className="flex-1 bg-gray-100 p-4">
+    <ScrollView className="flex-1 bg-gray-100 p-4 ">
       {/* Avatar & User Info */}
       <View className="bg-white rounded-2xl shadow p-4 items-center mb-6">
         <Image

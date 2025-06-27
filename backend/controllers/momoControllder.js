@@ -2,7 +2,6 @@
 const crypto = require('crypto');
 const axios = require('axios');
 const Order = require('../models/Order');
-// const Transaction = require('../models/Transaction');
 const Cart = require('../models/Cart');
 const { Product } = require('../models/Product');
 
@@ -60,12 +59,13 @@ const createPayment = async (req, res) => {
       total_price,
       shipping_address,
       payment_method: 'MOMO',
-      order_status: 'pending',
+      order_status: 'paid',
       cartItems // 🟢 Thêm giỏ hàng vào đơn
     });
     console.log("✅ Đã tạo đơn hàng với trạng thái pending:", orderId);
 
     // 🔐 3. Tạo chữ ký Momo
+    //để tạo một chuỗi dữ liệu gốc, chưa mã hóa, chứa tất cả các tham số quan trọng của giao dịch
     const rawSignature = `accessKey=${MOMO_ACCESS_KEY}&amount=${total_price}&extraData=${extraData}&ipnUrl=${MOMO_IPN_URL}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${MOMO_PARTNER_CODE}&redirectUrl=${MOMO_REDIRECT_URL}&requestId=${requestId}&requestType=${requestType}`;
     const signature = crypto.createHmac('sha256', MOMO_SECRET_KEY).update(rawSignature).digest('hex');
 

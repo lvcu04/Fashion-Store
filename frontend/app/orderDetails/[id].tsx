@@ -21,7 +21,7 @@ export interface ShippingAddress {
 }
 
 export type PaymentMethod = 'COD' | 'MOMO';
-export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'success' | 'cancelled';
+export type OrderStatus = 'pending' | 'paid' | 'delivered' | 'success' | 'cancelled';
 
 export interface Order {
   _id?: string;
@@ -163,7 +163,7 @@ const OrderDetail = () => {
                   ? 'text-green-600'
                   : orderData.order_status === 'cancelled'
                   ? 'text-red-500'
-                  : orderData.order_status === 'shipped'
+                  : orderData.order_status === 'delivered'
                   ? 'text-blue-500'
                   : 'text-orange-500'
               }`}
@@ -172,7 +172,7 @@ const OrderDetail = () => {
             </Text>
           </View>
 
-          {orderData.order_status !== 'shipped' && orderData.order_status !== 'success' && (
+          {orderData.order_status !== 'delivered' && orderData.order_status !== 'success' && (
             <TouchableOpacity
               onPress={cancelOrder}
               className="mt-8 bg-red-500 py-3 rounded-lg items-center"
