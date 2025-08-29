@@ -78,7 +78,14 @@ const NotificationItem: React.FC<{ item: NotificationType; onPress: () => void }
       className="my-2 bg-white rounded-2xl shadow-md overflow-hidden"
     >
       <View className="px-4 py-3">
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3">
+       <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="mb-3"
+          contentContainerStyle={{ flexDirection: 'row' }}
+          scrollEnabled={true}
+          nestedScrollEnabled={true} 
+        >
           {item.cartItems.map((cartItem, idx) => (
             <Image
               key={idx}
@@ -86,7 +93,7 @@ const NotificationItem: React.FC<{ item: NotificationType; onPress: () => void }
               className="w-20 h-20 rounded-lg mr-2"
             />
           ))}
-        </ScrollView>
+      </ScrollView>
 
         <View>
           <Text className="text-lg font-semibold text-gray-900">{statusInfo.title}</Text>

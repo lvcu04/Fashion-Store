@@ -1,0 +1,59 @@
+name: Fashion Store CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    # Backend
+    - name: Install backend dependencies
+      run: npm ci
+      working-directory: backend
+
+    - name: Run backend tests
+      run: npm test
+      working-directory: backend
+
+    - name: Build backend
+      run: npm run build || echo "No build step for backend"
+      working-directory: backend
+
+    # Frontend
+    - name: Install frontend dependencies
+      run: npm ci
+      working-directory: frontend
+
+    - name: Run frontend tests
+      run: npm test
+      working-directory: frontend
+
+    - name: Build frontend
+      run: npm run build
+      working-directory: frontend
+
+    # Deploy
+    - name: Deploy to server
+      run: |
+        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          cd /var/www/fashion-store
+          git pull origin main
+          cd backend
+          npm ci
+          pm2 restart backend-app-name
+        EOF
