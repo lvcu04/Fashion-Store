@@ -16,21 +16,9 @@ const momoRoutes = require('./routers/momoRouter');
 dotenv.config();
 
 const app = express(); 
-// ✅ Route webhook riêng - cần raw body
-// app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }), StripeWebhookHandler);
-// ✅ Parse JSON body trước khi vào các route bình thường
 app.use(express.json());
 
-
-
-// Thêm middleware CORS 
-
-// ✅ Route tạo session thanh toán
-// app.use('/api/stripe', StripeRoute);
-
-
-
-// ✅ Route đơn giản hiển thị thành công/hủy
+// ✅ Route đơn giản test
 app.get('/success', (req, res) => {
   res.send('✅ Thanh toán thành công! Stripe đã xử lý.');
 });
@@ -44,16 +32,20 @@ app.use('/api/user', UserRouter);
 app.use('/api/product', productRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/order', OrderRouter);
-
 app.use('/api/momo', momoRoutes);
 app.use('/api/cart', CartRouter);
 
 const PORT = process.env.PORT || 5000;
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`✅ Server running at http://localhost:${PORT}`);
+// chỉ start server khi chạy trực tiếp, để test thì export app
+if (require.main === module) {
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`✅ Server running at http://localhost:${PORT}`);
+    });
+  }).catch((err) => {
+    console.error('❌ Failed to connect to DB:', err);
   });
-}).catch((err) => {
-  console.error('❌ Failed to connect to DB:', err);
-});
+}
+
+module.exports = app; // 👈 export cho Jest dùng
