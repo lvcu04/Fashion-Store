@@ -43,8 +43,9 @@ jobs:
     - name: Run frontend test (basic)
       run: |
         npm run lint || echo "⚠️ No lint script, skipping"
-        node -e "require('fs').accessSync('./src/index.tsx'); console.log('✅ Frontend entry file OK');"
+        node -e "require('fs').accessSync('./app/_layout.tsx'); console.log('✅ Expo Router entrypoint OK');"
       working-directory: frontend
+
 
     - name: Build frontend
       run: npm run build
